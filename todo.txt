@@ -1,0 +1,5 @@
+UI
+- Enable how many players get points
+- How many points for biggest fish
+- Comma separated list for points per final result position
+- Quick select drop down for typical point structures (sm-liiga etc...)
