@@ -34,7 +34,7 @@ class miniRegexp {
     const DISQUALIFIED = '/\(disq\)$/';
     
     const RESULT = '/^(\*\d+|\d+)\.\s/';
-    /** LAke information with resulting array keys
+    /** Lake information with resulting array keys
      * 0 = whole line
      * 1 = lake name
      * 2 = in-game date and time
@@ -43,6 +43,21 @@ class miniRegexp {
      * 5 = real time
     */
     const LAKE_INFORMATION = '/^[\s\w]*:\s+([\s\w]*)\.\s+\((\d+\.\d+\.\s\d+:\d+)\/\s+(\d+)\s+min\s*\/\s+\w+\s\/\s+([\w+\s+]*)\s+\/[\s\w+]*\)\s+\[([0-9]+\.[0-9]+\.[0-9]+\s[0-9]+:[0-9]+)\]/';
+    
+    /** Player information including with the country tag after name, was too lazy to build too complex regexp for now
+     * 0 = whole line
+     * 1 = result position
+     * 2 = Team tag (could be empty '')
+     * 3 = Name with the country tag (if there is one)
+     * 4 = score
+     */
+    const PLAYER_INFORMATION = '/(\*\d+|\d+)\.\s+(\[.*\]\s){0,1}(.+)\s+(\d+)\s+g/';
+    
+    /** Player country
+     * 0 = whole line
+     * 1 = country code
+     */
+    const PLAYER_COUNTRY = '/\[(.*)\]\s+$/';
     /*
      * Which part of round currently in process, easier to create clauses and predict what to do next
      */
@@ -95,40 +110,13 @@ class miniRegexp {
         }
     }
     
-    public function getPlayer($row) {
-        /**
-            1. [SK] Kala-Ukko (C) [FIN]  8602 g 
-            2. [Team Hurrikaani] Jägermeister [FIN]  6735 g 
-            3. [Team Hurrikaani] aku ankka (A) [FIN]  5847 g 
-            4. [TKN] NatoTaimen [FIN]  5453 g 
-            5. [TKN] LeaTee [FIN]  5402 g 
-            6. [SK] kokitar [FIN]  5108 g 
-            7. [SK] Mikko Jalonen [FIN]  5073 g 
-            8. [TKN] jalmari  4502 g 
-            9. [Team Hurrikaani] KuKa [FIN]  4170 g 
-            10. [TKN] Nökerö  4167 g 
-            11. [Team Hurrikaani] rohni [FIN]  4108 g 
-            12. [TKN] pasuripaavo [FIN]  3968 g 
-            13. [Team Hurrikaani] Pauli.J.E [FIN]  3786 g 
-            14. [SK] Kaitsu [FIN]  3740 g 
-            15. [Team Hurrikaani] korpelannapakymppi10(C  3501 g 
-            16. [SK] Ohiampuja (TA1) [FIN]  3430 g 
-            17. [SK] Juku6.1(A) [FIN]  3288 g 
-            18. [TKN] Pegu  3244 g 
-            *19. [TKN] -heikki- [FI]  3197 g 
-            20. [Team Hurrikaani] JARI PEKKA [FIN]  2983 g 
-            21. [TKN] Aanrii(C)  2036 g 
-            22. [SK] Pirkko [FIN]  1545 g 
-            23. [SK] jönssi [FIN]  1485 g 
-            24. [Team Hurrikaani] Tiikeri2(kk) [FIN]  853 g 
-         */
-        $reg = '/(\*\d+|\d+)\.\s+(\[.*\]\s+){0,1}(.+)\s+(\[[a-zA-ZäöåÄÖÅ]+\]){0,1}(\d+)\s+g/';
+    public function getPlayer($row) {   
         // NetBeans complains for uninitialized variables
         $matches = null;
-        
-        preg_match($reg, $row, $matches);
-        print_r($matches);
-        
+        $country = null;
+        preg_match(self::PLAYER_INFORMATION, $row, $matches);
+        preg_match(self::PLAYER_COUNTRY, $matches[3], $country);
+        $matches[] = $country[1];
         return $matches;
     }
     
@@ -149,7 +137,6 @@ class miniRegexp {
         $matches = null;
         preg_match(self::LAKE_INFORMATION, $row, $matches);
         return $matches;
-
     }
     
     /**
@@ -199,7 +186,7 @@ class miniRegexp {
     
     public function process() {
         $this->rows = explode("\n", $this->file);
-        $i = 0;
+        
         foreach ($this->rows as $r) {
             $this->currentLine++;
             $r = trim($r);
@@ -223,8 +210,6 @@ class miniRegexp {
                    break;
                case ($this->getStage() === self::RESULTS && $this->isResult($r)):
                    $plr = $this->getPlayer($r);
-                   $i++;
-                   if ($i == 10) { die(); }
                    break;
             }
         }
