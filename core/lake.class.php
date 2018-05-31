@@ -7,6 +7,7 @@ class miniLake {
     
     public $lakeName = '';
     public $ingameTime = '';
+    public $roundLength = '';
     public $gameType = '';
     public $realTime = '';
     public $players = array();
@@ -14,5 +15,25 @@ class miniLake {
     
     public function __construct(miniPPBuddy &$buddy) {
         $this->buddy = $buddy;
+    }
+    
+    public function setName($name) {
+        
+    }
+    
+    public function setIngameTime($time) {
+        
+    }
+    
+    public function setGameType($gameType) {
+        
+    }
+    
+    public function setRealTime($realTime) {
+        
+    }
+    
+    public function setRoundLength($length) {
+        
     }
 }
