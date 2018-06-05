@@ -1,0 +1,9 @@
+<select name="fish" id="fishId">
+   <option value="110">Kokonaispaino, 10 min</option>
+   <option value="115">Kokonaispaino, 15 min</option>
+   <option value="130">Kokonaispaino, 30 min</option>
+   <option value="160">Kokonaispaino, 1 tunti</option>
+   <option value="190">Kokonaispaino, 1.5 tuntia</option>
+   <option value="220">Kokonaispaino, 2 tuntia</option>
+   <option value="0">-- KAIKKI KALALAJIT --</option>
+   <option value="50" selected="">-- KAIKKI KALALAJIT, EI MADETTA --</option><option value="1"> Ahven</option><option value="11"> Harjus</option><option value="9"> Harmaanieriä</option><option value="3"> Hauki</option><option value="28"> Isosimppu</option><option value="2"> Kiiski</option><option value="5"> Kirjolohi</option><option value="27"> Kivinilkka</option><option value="32"> Kolmipiikki</option><option value="4"> Kuha</option><option value="14"> Kuore</option><option value="17"> Lahna</option><option value="10"> Lohi</option><option value="26"> Made</option><option value="29"> Miekkasärki</option><option value="13"> Muikku</option><option value="18"> Pasuri</option><option value="8"> Puronieriä</option><option value="7"> Rautu</option><option value="25"> Ruutana</option><option value="22"> Salakka</option><option value="15"> Särki</option><option value="20"> Säyne</option><option value="16"> Seipi</option><option value="12"> Siika</option><option value="31"> Silakka</option><option value="21"> Sorva</option><option value="19"> Sulkava</option><option value="30"> Suutari</option><option value="6"> Taimen</option><option value="24"> Toutain</option><option value="23"> Turpa</option> </select>

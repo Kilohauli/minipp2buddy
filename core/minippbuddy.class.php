@@ -45,8 +45,8 @@ class miniPPBuddy {
     public function strip($string) {
         return (string) strtolower(
             str_replace(
-                    array("[", "]", 'ä', 'ö', 'å', 'Ä', 'Ö', 'Å'), 
-                    array('', '', 'a', 'o', 'a', 'A', 'O', 'A'), 
+                    array("[", "]", 'ä', 'ö', 'å', 'Ä', 'Ö', 'Å', ' ', '(', ')', '-'), 
+                    array('', '', 'a', 'o', 'a', 'A', 'O', 'A', '', '', '', '_'), 
                         $string));
     }
     
@@ -73,5 +73,20 @@ class miniPPBuddy {
     
     public function getRound() {
         return $this->currentRound;
+    }
+    
+    public function newPlayer($name) {
+        if (!class_exists('miniPlayer')) {
+            require_once dirname(__FILE__) . '/player.class.php';
+        }
+        
+    }
+    
+    public function getPlayer($id) {
+        
+    }
+    
+    public function playerId($name) {
+        
     }
 }

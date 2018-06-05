@@ -14,8 +14,8 @@ class miniRegexp {
     /**
      * Next constants use strpos() to match beginning of line
      */
-    // Catches biggest fish and who got it
-    const BIGGEST_FIST = 'Isoin kala:';
+    // Catches biggest fish heading
+    const BIGGEST_FISH = 'Isoin kala:';
     // Catches lake, time and so on
     const NEW_ROUND = 'New LAN SERVER';
     // Begin row processing after this row
@@ -58,6 +58,32 @@ class miniRegexp {
      * 1 = country code
      */
     const PLAYER_COUNTRY = '/\[(.*)\]\s+$/';
+    
+    /**
+     * Fishes player name
+     * Used in two cases, stripping out the name and when testing if the row is the player name or fish result
+     */
+    const FISHES_PLAYER_NAME = '/^(.*)(:)$/';
+    
+    /**
+     * Individual fish row
+     * 0 = whole line
+     * 1 = Fish
+     * 2 = How many
+     * 3 = Total weight
+     * 4 = Biggest
+     */
+    const FISHES_FOR_PLAYER = '/([a-zA-ZäöåÄÖÅ]*)\s+[a-zA-ZäöåÄÖÅ]+:\s+(\d+)\s+[a-zA-Z]+:\s+(\d+)\s+\([a-zA-Z]+:\s(\d+)\s+g\)/';
+    
+    /**
+     * Biggest fish for the lake
+     * 0 = whole line
+     * 1 = player name
+     * 2 = fish
+     * 3 = weight
+     */
+    const BIGGEST_FISH_FOR_LAKE = '/(.*)\s\s([a-zA-ZäöåÄÖÅ]*)\s+(\d+)\s+g/';
+    
     /*
      * Which part of round currently in process, easier to create clauses and predict what to do next
      */
@@ -108,6 +134,7 @@ class miniRegexp {
         if (strpos($row, self::NEW_ROUND) === 0) {
             return true;
         }
+        return false;
     }
     
     public function getPlayer($row) {   
@@ -116,20 +143,24 @@ class miniRegexp {
         $country = null;
         preg_match(self::PLAYER_INFORMATION, $row, $matches);
         preg_match(self::PLAYER_COUNTRY, $matches[3], $country);
-        $matches[] = $country[1];
+        if (isset($country[1])) {
+            $matches[] = $country[1];
+        }
         return $matches;
     }
     
-    public function getTeam($row) {
-        
-    }
-    
-    public function getScore($row) {
-        
-    }
-    
     public function getBiggest($row) {
-        
+        $matches = array();
+        preg_match(self::BIGGEST_FISH_FOR_LAKE, $row, $matches);
+        print_r($matches);
+        return $matches;
+    }
+    
+    public function isBiggestFish($row) {
+        if (strpos($row, self::BIGGEST_FISH) === 0) {
+            return true;
+        }
+        return false;
     }
     
     public function getLake($row) {
@@ -184,9 +215,35 @@ class miniRegexp {
         return false;
     }
     
+    public function isOwnFish($row) {
+        if (strpos($row, self::SKIP_OWN) === 0) {
+            return true;
+        }
+        return false;
+    }
+    
+    public function isFishesPlayer($row) {
+        if (preg_match(self::FISHES_PLAYER_NAME, $row)) {
+            return true;
+        }
+        return false;
+    }
+    
+    public function fishesPlayer($row) {
+        $matches = array();
+        preg_match(self::FISHES_PLAYER_NAME, $row, $matches);
+        return $matches;
+    }
+    
+    public function fishForPlayer($row) {
+        $matches = array();
+        preg_match(self::FISHES_FOR_PLAYER, $row, $matches);
+        return $matches;
+    }
+    
     public function process() {
         $this->rows = explode("\n", $this->file);
-        
+        $i = 0;
         foreach ($this->rows as $r) {
             $this->currentLine++;
             $r = trim($r);
@@ -210,6 +267,23 @@ class miniRegexp {
                    break;
                case ($this->getStage() === self::RESULTS && $this->isResult($r)):
                    $plr = $this->getPlayer($r);
+                   break;
+               case ($this->isOwnFish($r)) :
+                   $this->setStage(self::FISHES);
+                   break;
+               // Two step parsing due to rows including first the player name and then the fishies
+               // Note that the player name is without country or team tags! Bloody stupid!
+               case ($this->getStage() === self::FISHES && $this->isFishesPlayer($r) && $this->isBiggestFish($r) === false) :
+                   $playerName = $this->fishesPlayer($r);
+                   break;
+               case ($this->getStage() === self::FISHES && $this->isBiggestFish($r) === false) :
+                   $fishDetails = $this->fishForPlayer($r);
+                   break;
+               case ($this->getStage() === self::FISHES && $this->isBiggestFish($r)) :
+                   $this->setStage(self::BIGGEST);
+                   break;
+               case ($this->getStage() == self::BIGGEST) :
+                   $this->getBiggest($r);
                    break;
             }
         }
