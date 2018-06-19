@@ -105,7 +105,7 @@ class miniPPBuddy {
         if (!array_key_exists($stripped, $this->players)) {
             return false;
         }
-        return $this->players[$stripped];;
+        return $this->players[$stripped];
     }
     
     public function setBiggestFish($lake, $name, $fish) {
