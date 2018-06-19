@@ -137,7 +137,18 @@ class miniRegexp {
         return false;
     }
     
-    public function getPlayer($row) {   
+    /**
+     * Return player details array
+     * 0 = whole line
+     * 1 = Result position
+     * 2 = Team tag (could be empty '')
+     * 3 = Name
+     * 4 = Score
+     * 5 = Country tag (can be null)
+     * @param string $row
+     * @return array
+     */
+    public function getPlayerDetails($row) {   
         // NetBeans complains for uninitialized variables
         $matches = null;
         $country = null;
@@ -145,6 +156,9 @@ class miniRegexp {
         preg_match(self::PLAYER_COUNTRY, $matches[3], $country);
         if (isset($country[1])) {
             $matches[] = $country[1];
+            $matches[3] = trim(str_replace("[" . $country[1] . "]", '', $matches[3]));
+        } else {
+            $matches[] = null;
         }
         return $matches;
     }
@@ -152,7 +166,6 @@ class miniRegexp {
     public function getBiggest($row) {
         $matches = array();
         preg_match(self::BIGGEST_FISH_FOR_LAKE, $row, $matches);
-        print_r($matches);
         return $matches;
     }
     
@@ -244,6 +257,9 @@ class miniRegexp {
     public function process() {
         $this->rows = explode("\n", $this->file);
         $i = 0;
+        $lake = null;
+        $player = null;
+        
         foreach ($this->rows as $r) {
             $this->currentLine++;
             $r = trim($r);
@@ -266,7 +282,20 @@ class miniRegexp {
                    $this->setStage(self::RESULTS);
                    break;
                case ($this->getStage() === self::RESULTS && $this->isResult($r)):
-                   $plr = $this->getPlayer($r);
+                   $plr = $this->getPlayerDetails($r);
+                   /*if ($this->buddy->getPlayer($plr[3]) === false) {
+                       $player = $this->buddy->newPlayer($plr[3]);
+                   } else {
+                       $player = $this->buddy->getPlayer($plr[3]);
+                   }*/
+                   if (!$player = $this->buddy->getPlayer($plr[3])) {
+                       $player = $this->buddy->newPlayer($plr[3]);
+                   }
+                   $player->setPosition($this->buddy->getRound(), $plr[1]);
+                   $player->setTeam($plr[2]);
+                   $player->setName($plr[3]);
+                   $player->setScore($this->buddy->getRound(), $plr[4]);
+                   $player->setCountry($plr[5]);
                    break;
                case ($this->isOwnFish($r)) :
                    $this->setStage(self::FISHES);
@@ -277,16 +306,18 @@ class miniRegexp {
                    $playerName = $this->fishesPlayer($r);
                    break;
                case ($this->getStage() === self::FISHES && $this->isBiggestFish($r) === false) :
+                   $player = $this->buddy->getPlayer($playerName[1]);
                    $fishDetails = $this->fishForPlayer($r);
+                   $player->setFishes($this->buddy->getRound(), $fishDetails);
                    break;
                case ($this->getStage() === self::FISHES && $this->isBiggestFish($r)) :
                    $this->setStage(self::BIGGEST);
                    break;
                case ($this->getStage() == self::BIGGEST) :
-                   $this->getBiggest($r);
+                   $biggest = $this->getBiggest($r);
+                   $this->buddy->setBiggestFish($this->buddy->getRound(), $biggest[1], $biggest);
                    break;
             }
         }
     }
-    
 }

@@ -8,6 +8,7 @@ class miniPlayer {
     protected $country = '';
     protected $positions = array();
     protected $scores = array();
+    protected $fishes = array();
     
     public function __construct(miniPPBuddy &$buddy) {
         $this->buddy = $buddy;
@@ -25,12 +26,56 @@ class miniPlayer {
         $this->country = $country;
     }
     
+    /*** NEXT ONES MIGHT CHANGE ***/
+    
+    /**
+     * Set position for lake which is same as current rounds integer for simplicity
+     * 
+     * @param integer $lake
+     * @param integer $position
+     */
     public function setPosition($lake, $position) {
-        $this->positions[] = $position;
+        $this->positions[$lake] = $position;
     }
     
+    /**
+     * Set score for lake which is same as current rounds integer for simplicity
+     * 
+     * @param integer $lake
+     * @param integer $score
+     */
     public function setScore($lake, $score) {
-        $this->scores[] = $score;
+        $this->scores[$lake] = $score;
+    }
+    
+    /**
+     * Set individual fish species with their score per lake
+     * 
+     * @param integer $lake
+     * @param array $fish
+     */
+    public function setFishes($lake, $fish) {
+        $this->fishes[$lake][] = array(
+            'fish' => $fish[1],
+            'amount' => $fish[2],
+            'weight' => $fish[3],
+            'biggest' => $fish[4]
+        );
+    }
+    
+    public function getFishes($lake) {
+        return $this->fishes[$lake];
+    }
+    
+    public function debug() {
+        print_r(array(
+            'name' => $this->name,
+            'team' => $this->team,
+            'country' => $this->country,
+            'scores' => $this->scores,
+            'positions' => $this->positions,
+            'fishies' => $this->fishes
+        ));
     }
     
 }

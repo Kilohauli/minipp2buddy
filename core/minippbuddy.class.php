@@ -19,6 +19,10 @@ class miniPPBuddy {
     
     private $currentRound = 0;
     
+    private $players = array();
+    
+    private $biggestFishes = array();
+    
     public function __construct($config) {
         
     }
@@ -58,6 +62,13 @@ class miniPPBuddy {
         return $this->debug();
     }
     
+    public function debug() {
+        print_r(array(
+            array_keys($this->lakes),
+            array_keys($this->players),
+            $this->biggestFishes
+        ));
+    }
     /**
      * 
      * @return miniLake
@@ -75,18 +86,33 @@ class miniPPBuddy {
         return $this->currentRound;
     }
     
+    /**
+     * 
+     * @param string $name
+     * @return miniPlayer
+     */
     public function newPlayer($name) {
+        $stripped = $this->strip($name);
         if (!class_exists('miniPlayer')) {
             require_once dirname(__FILE__) . '/player.class.php';
         }
-        
+        $this->players[$stripped] = new miniPlayer($this);
+        return $this->players[$stripped];
     }
     
-    public function getPlayer($id) {
-        
+    public function getPlayer($name) {
+        $stripped = $this->strip($name);
+        if (!array_key_exists($stripped, $this->players)) {
+            return false;
+        }
+        return $this->players[$stripped];;
     }
     
-    public function playerId($name) {
-        
+    public function setBiggestFish($lake, $name, $fish) {
+        $this->biggestFishes[$lake] = array(
+            'player' => $this->strip($name),
+            'fish' => $fish[2],
+            'weight' => $fish[3]
+        );
     }
 }
