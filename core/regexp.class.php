@@ -133,7 +133,7 @@ class miniRegexp {
     }
     
     public function isNewRound($row) {
-        if (strpos($row, self::NEW_ROUND) === 0 || srtpos($row, self::NEW_ROUND_SELF) === 0) {
+        if (strpos($row, self::NEW_ROUND) === 0 || strpos($row, self::NEW_ROUND_SELF) === 0) {
             return true;
         }
         return false;
