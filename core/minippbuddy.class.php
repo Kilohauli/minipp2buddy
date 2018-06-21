@@ -3,30 +3,59 @@
 class miniPPBuddy {
     protected $config = array();
     
+    /**
+     * @var miniRegexp miniRegexp class
+     */
     protected $regex = null;
     
     /**
-     * Enables console printing when set to true
-     * @var $debug boolean
+     * @var boolean Enables console printing when set to true
      */
     private $debug = false;
     
     /**
-     * Lake objects which in simplicity are rounds
-     * @var array
+     * @var array Lake objects which in simplicity are rounds
      */
     private $lakes = array();
     
+    /**
+     * @var int Current round number which miniRegexp parser is parsing
+     */
     private $currentRound = 0;
     
+    /**
+     * @var array player objects array per round
+     */
     private $players = array();
     
+    /**
+     * @var array Biggest fishes per round
+     */
     private $biggestFishes = array();
+    
+    /**
+     * @var int Amount of rounds to be parsed, zero equals to infinite rounds
+     */
+    private $rounds = 0;
+    
+    /**
+     * @var array Holds the points given per round
+     */
+    private $points = array();
+
+    /**
+     * @var array Holds the points for biggest fish given per round
+     */
+    private $biggestPoints = array();
     
     public function __construct($config) {
         
     }
     
+    /**
+     * Load parser which goes through the playlog
+     * @return miniRegexp
+     */
     public function getRegexp() {
         if ($this->regex !== null) {
             return $this->regex;
@@ -69,8 +98,9 @@ class miniPPBuddy {
             $this->biggestFishes
         ));
     }
+    
     /**
-     * 
+     * Create new miniLake object
      * @return miniLake
      */
     public function newLake() {
@@ -82,8 +112,29 @@ class miniPPBuddy {
         return $this->lakes[$this->currentRound];
     }
     
+    /**
+     * Get current round number
+     * @return int
+     */
     public function getRound() {
         return $this->currentRound;
+    }
+    
+    /**
+     * Set how many rounds are parsed from play log
+     * @param int $rounds
+     */
+    public function setRounds($rounds) {
+        $this->rounds = $rounds;
+    }
+    
+    /**
+     * Return amount of rounds will be played, even there is basically unlimited
+     * round option just by slamming in huge playlog.
+     * @return int
+     */
+    public function getRounds() {
+        return $this->rounds;
     }
     
     /**
@@ -100,6 +151,11 @@ class miniPPBuddy {
         return $this->players[$stripped];
     }
     
+    /**
+     * 
+     * @param type $name
+     * @return false|miniPlayer
+     */
     public function getPlayer($name) {
         $stripped = $this->strip($name);
         if (!array_key_exists($stripped, $this->players)) {
@@ -108,11 +164,70 @@ class miniPPBuddy {
         return $this->players[$stripped];
     }
     
+    /**
+     * Set biggest for round/lake
+     * @param int $lake
+     * @param string $name
+     * @param array $fish
+     */
     public function setBiggestFish($lake, $name, $fish) {
         $this->biggestFishes[$lake] = array(
             'player' => $this->strip($name),
             'fish' => $fish[2],
             'weight' => $fish[3]
         );
+    }
+    
+    /**
+     * Get array of parsed lakes
+     * @return array
+     */
+    public function getLakes() {
+        return $this->lakes;
+    }
+    
+    /**
+     * Get array of players for round/lake
+     * @param int $round
+     * @return array
+     */
+    public function getPlayers($round) {
+        return $this->players[$round];
+    }
+    
+    public function setPoints($points) {
+        if (!is_array($points)) {
+            /** 
+             * Index starts from 1 which corresponds to current round which
+             * oddly enough is not a zero 
+             **/
+            $this->points[1] = array_map("trim", explode(",", $points));
+        } else {
+            /**
+             * Same as above but due to multiple rounds some loopy loopy has to
+             * be done
+             */
+            foreach ($points as $key => $p) {
+                $this->points[($key + 1)] = array_map("trim", explode(",", $p));
+            }
+        }
+    }
+    
+    public function getPoints($round) {
+        return $this->points[$round];
+    }
+    
+    public function setBiggestPoints($points) {
+        if (!is_array($points)) {
+            $this->biggestPoints[1] = array_map("trim", explode(",", $points));
+        } else {
+            foreach ($points as $key => $p) {
+                $this->biggestPoints[($key + 1)] = array_map("trim", explode(",", $p));
+            }
+        }
+    }
+    
+    public function getBiggestPoints($round) {
+        return $this->biggestPoints[$round];
     }
 }

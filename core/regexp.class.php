@@ -261,7 +261,7 @@ class miniRegexp {
         $i = 0;
         $lake = null;
         $player = null;
-        
+        $rounds = $this->buddy->getRounds();
         foreach ($this->rows as $r) {
             $this->currentLine++;
             $r = trim($r);
@@ -270,10 +270,11 @@ class miniRegexp {
             }
             
             switch (true) {
-               case $this->isNewRound($r):
+               case $this->isNewRound($r) && ($this->buddy->getRound() < $rounds || $rounds === 0):
                    $this->setStage(self::IRRELEVANT);
                    $lakeInformation = $this->getLake($r);
                    $lake = $this->buddy->newLake();
+                   $lake->setRoundNumber($this->buddy->getRound());
                    $lake->setName($lakeInformation[1]);
                    $lake->setIngameTime($lakeInformation[2]);
                    $lake->setRoundLength($lakeInformation[3]);
@@ -288,6 +289,7 @@ class miniRegexp {
                    if (!$player = $this->buddy->getPlayer($plr[3])) {
                        $player = $this->buddy->newPlayer($plr[3]);
                    }
+                   $lake->setPlayer($player);
                    $player->setPosition($this->buddy->getRound(), $plr[1]);
                    $player->setTeam($plr[2]);
                    $player->setName($plr[3]);
