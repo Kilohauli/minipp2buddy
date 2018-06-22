@@ -43,8 +43,24 @@ class miniPPBuddy {
      */
     private $biggestPoints = array();
     
+    /**
+     *
+     * @var array Final results before sorting
+     */
+    private $finalResults = array();
+    
     public function __construct($config) {
-        
+        $this->sanitize();
+        // Currently not in use
+        $this->config = array_merge($this->config, $config);
+    }
+    
+    /**
+     * Sanitize _GET and _POST
+     */
+    public function sanitize() {
+        $_GET = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+        $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
     }
     
     /**
@@ -236,5 +252,24 @@ class miniPPBuddy {
             return $this->biggestPoints[1];
         }
         return $this->biggestPoints[$round];
+    }
+    
+    public function finalScore($scores) {
+        $finalScore = array();
+        foreach ($scores as $key => $score) {
+            foreach($score as $id => $result) {
+                if (array_key_exists($id, $finalScore)) {
+                    $finalScore[$id] += (int) $result['points'];
+                } else {
+                    $finalScore[$id] = (int) $result['points'];
+                }
+            }
+
+        }
+        print_r($finalScore);
+        arsort($finalScore, SORT_NUMERIC);
+        foreach($finalScore as $key => $score) {
+            echo $this->getPlayer($key)->getName() . " - " . $score . "\n";
+        }
     }
 }

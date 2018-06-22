@@ -97,6 +97,11 @@ class miniLake {
     public function process() {
         $out = array();
         foreach($this->points as $key => $point) {
+            if (!isset($this->players[$key])) {
+                /* Quick kill switch if there is no more players in the 
+                 * $this->players array */
+                break;
+            }
             $this->endScores[$this->buddy->strip($this->players[$key]->getName())] = array(
                 'name' => $this->players[$key]->getName(),
                 'points' => (int) $point

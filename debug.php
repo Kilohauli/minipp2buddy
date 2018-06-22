@@ -2,7 +2,7 @@
 
 require_once('./core/minippbuddy.class.php');
 
-$mini = new miniPPBuddy(array());
+$buddy = new miniPPBuddy(array());
 
 /**
  * Mimic the parameters passed from the website for round scores
@@ -16,20 +16,20 @@ $biggestDummy = "1";
 $scoresDummyArray = array();
 $scoresBiggestArray = array();
 
-$mini->setPoints($scoresDummy);
-$mini->setBiggestPoints($biggestDummy);
-$exp = $mini->getRegexp();
-$mini->setRounds(1);
+$buddy->setPoints($scoresDummy);
+$buddy->setBiggestPoints($biggestDummy);
+$exp = $buddy->getRegexp();
+$buddy->setRounds(1);
 $f = file_get_contents('./score_demo.txt');
 
 $exp->setFile($f);
 
 $exp->process();
 
-$lakes = $mini->getLakes();
+$lakes = $buddy->getLakes();
 
 foreach ($lakes as $key => $lake) {
-    $lake->debug();
-    $lake->process();
-
+    $scores[] = $lake->process();
 }
+
+$buddy->finalScore($scores);
