@@ -27,12 +27,7 @@ class miniPPBuddy {
      * @var array player objects array per round
      */
     private $players = array();
-    
-    /**
-     * @var array Biggest fishes per round
-     */
-    private $biggestFishes = array();
-    
+
     /**
      * @var int Amount of rounds to be parsed, zero equals to infinite rounds
      */
@@ -165,20 +160,6 @@ class miniPPBuddy {
     }
     
     /**
-     * Set biggest for round/lake
-     * @param int $lake
-     * @param string $name
-     * @param array $fish
-     */
-    public function setBiggestFish($lake, $name, $fish) {
-        $this->biggestFishes[$lake] = array(
-            'player' => $this->strip($name),
-            'fish' => $fish[2],
-            'weight' => $fish[3]
-        );
-    }
-    
-    /**
      * Get array of parsed lakes
      * @return array
      */
@@ -195,6 +176,10 @@ class miniPPBuddy {
         return $this->players[$round];
     }
     
+    /**
+     * Set points for player results
+     * @param array|string $points
+     */
     public function setPoints($points) {
         if (!is_array($points)) {
             /** 
@@ -213,10 +198,23 @@ class miniPPBuddy {
         }
     }
     
+    /**
+     * Return points array for round/lake, always returns first round points if
+     * only one pattern for round points defined
+     * @param int $round
+     * @return array
+     */
     public function getPoints($round) {
+        if (count($this->points) == 1) {
+            return $this->points[1];
+        }
         return $this->points[$round];
     }
     
+    /**
+     * Set points for biggest fish
+     * @param array|string $points
+     */
     public function setBiggestPoints($points) {
         if (!is_array($points)) {
             $this->biggestPoints[1] = array_map("trim", explode(",", $points));
@@ -227,7 +225,16 @@ class miniPPBuddy {
         }
     }
     
+    /**
+     * Return biggest fish points array for round/lake, always returns first
+     * round points if only one pattern for biggest fish points defined
+     * @param int $round
+     * @return array
+     */
     public function getBiggestPoints($round) {
+        if (count($this->biggestPoints) == 1) {
+            return $this->biggestPoints[1];
+        }
         return $this->biggestPoints[$round];
     }
 }

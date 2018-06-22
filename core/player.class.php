@@ -18,6 +18,9 @@ class miniPlayer {
         $this->name = $name;
     }
     
+    public function getName() {
+        return $this->name;
+    }
     public function setTeam($team) {
         $this->team = $team;
     }

@@ -17,9 +17,9 @@ $scoresDummyArray = array();
 $scoresBiggestArray = array();
 
 $mini->setPoints($scoresDummy);
-
+$mini->setBiggestPoints($biggestDummy);
 $exp = $mini->getRegexp();
-$mini->setRounds(2);
+$mini->setRounds(1);
 $f = file_get_contents('./score_demo.txt');
 
 $exp->setFile($f);
@@ -30,6 +30,6 @@ $lakes = $mini->getLakes();
 
 foreach ($lakes as $key => $lake) {
     $lake->debug();
-    $players = $lake->getPlayers();
+    $lake->process();
 
 }

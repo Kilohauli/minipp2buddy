@@ -270,7 +270,7 @@ class miniRegexp {
             }
             
             switch (true) {
-               case $this->isNewRound($r) && ($this->buddy->getRound() < $rounds || $rounds === 0):
+               case $this->isNewRound($r) || ($this->buddy->getRound() < $rounds || $rounds === 0):
                    $this->setStage(self::IRRELEVANT);
                    $lakeInformation = $this->getLake($r);
                    $lake = $this->buddy->newLake();
@@ -280,6 +280,8 @@ class miniRegexp {
                    $lake->setRoundLength($lakeInformation[3]);
                    $lake->setGameType($lakeInformation[4]);
                    $lake->setRealTime($lakeInformation[5]);
+                   $lake->setPoints($this->buddy->getPoints($this->buddy->getRound()));
+                   $lake->setBiggestPoints($this->buddy->getBiggestPoints($this->buddy->getRound()));
                    break;
                case $this->isFinished($r):
                    $this->setStage(self::RESULTS);
@@ -314,7 +316,8 @@ class miniRegexp {
                    break;
                case ($this->getStage() == self::BIGGEST) :
                    $biggest = $this->getBiggest($r);
-                   $this->buddy->setBiggestFish($this->buddy->getRound(), $biggest[1], $biggest);
+                   $lake->setBiggestFish($biggest);
+                   $this->setStage(self::IRRELEVANT);
                    break;
             }
         }
