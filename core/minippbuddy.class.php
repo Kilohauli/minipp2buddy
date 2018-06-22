@@ -266,10 +266,7 @@ class miniPPBuddy {
             }
 
         }
-        print_r($finalScore);
         arsort($finalScore, SORT_NUMERIC);
-        foreach($finalScore as $key => $score) {
-            echo $this->getPlayer($key)->getName() . " - " . $score . "\n";
-        }
+        return $finalScore;
     }
 }
