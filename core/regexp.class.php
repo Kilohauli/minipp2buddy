@@ -28,7 +28,12 @@ class miniRegexp {
     const JOIN = '-->';
     // Leaving players
     const LEAVE = '<--';
-
+    // Skip new game line
+    const NEW_GAME = '---------------';
+    
+    // Break out from whole loop when game abandoned
+    const ABANDON = 'Competition aborted';
+    
     /** 
      * Next constants are for regular expressions 
      */
@@ -36,6 +41,7 @@ class miniRegexp {
     const DISQUALIFIED = '/\(disq\)$/';
     
     const RESULT = '/^(\*\d+|\d+)\.\s/';
+    
     /** Lake information with resulting array keys
      * 0 = whole line
      * 1 = lake name
@@ -44,7 +50,7 @@ class miniRegexp {
      * 4 = game type
      * 5 = real time
     */
-    const LAKE_INFORMATION = '/^[\s\w]*:\s+([\s\w]*)\.\s+\((\d+\.\d+\.\s\d+:\d+)\/\s+(\d+)\s+min\s*\/\s+\w+\s\/\s+([\w+\s+]*)\s+\/[\s\w+]*\)\s+\[([0-9]+\.[0-9]+\.[0-9]+\s[0-9]+:[0-9]+)\]/';
+    const LAKE_INFORMATION = '/^[\s\w]*:\s+([\s\w-]*)\.\s+\((\d+\.\d+\.\s\d+:\d+)\/\s+(\d+)\s+min\s*\/\s+\w+\s\/\s+([\w+\s+,]*)\s+\/[\s\w+]*\)\s+\[([0-9]+\.[0-9]+\.[0-9]+\s[0-9]+:[0-9]+)\]/';
     
     /** Player information including with the country tag after name, was too lazy to build too complex regexp for now
      * 0 = whole line
@@ -95,7 +101,7 @@ class miniRegexp {
     const RESULTS = 1;
     const FISHES = 2;
     const BIGGEST = 3;
-    
+    const SKIP_UNTILL_NEW_ROUND = 4;
     
     // File contents (There is not actual file to be uploaded, only a string
     private $file = null;
@@ -181,7 +187,10 @@ class miniRegexp {
     public function getLake($row) {
         // NetBeans complains for uninitialized variables
         $matches = null;
+        echo $row . "\n";
         preg_match(self::LAKE_INFORMATION, $row, $matches);
+        print_r($matches);
+        die();
         return $matches;
     }
     
@@ -256,6 +265,20 @@ class miniRegexp {
         return $matches;
     }
     
+    
+    public function abandonRound($row) {
+        if (strpos($row, self::ABANDON) === 0) {
+            return true;
+        }
+        return false;
+    }
+    
+    
+    public function removeRound() {
+        $this->buddy->removeLake($this->buddy->getRound());
+        $this->buddy->setRound(($this->buddy->getRound() - 1));
+    }
+    
     public function process() {
         $this->rows = explode("\n", $this->file);
         $i = 0;
@@ -270,55 +293,65 @@ class miniRegexp {
             }
             
             switch (true) {
-               case $this->isNewRound($r) || ($this->buddy->getRound() < $rounds || $rounds === 0):
-                   $this->setStage(self::IRRELEVANT);
-                   $lakeInformation = $this->getLake($r);
-                   $lake = $this->buddy->newLake();
-                   $lake->setRoundNumber($this->buddy->getRound());
-                   $lake->setName($lakeInformation[1]);
-                   $lake->setIngameTime($lakeInformation[2]);
-                   $lake->setRoundLength($lakeInformation[3]);
-                   $lake->setGameType($lakeInformation[4]);
-                   $lake->setRealTime($lakeInformation[5]);
-                   $lake->setPoints($this->buddy->getPoints($this->buddy->getRound()));
-                   $lake->setBiggestPoints($this->buddy->getBiggestPoints($this->buddy->getRound()));
-                   break;
-               case $this->isFinished($r):
-                   $this->setStage(self::RESULTS);
-                   break;
-               case ($this->getStage() === self::RESULTS && $this->isResult($r)):
-                   $plr = $this->getPlayerDetails($r);
-                   if (!$player = $this->buddy->getPlayer($plr[3])) {
-                       $player = $this->buddy->newPlayer($plr[3]);
-                   }
-                   $lake->setPlayer($player);
-                   $player->setPosition($this->buddy->getRound(), $plr[1]);
-                   $player->setTeam($plr[2]);
-                   $player->setName($plr[3]);
-                   $player->setScore($this->buddy->getRound(), $plr[4]);
-                   $player->setCountry($plr[5]);
-                   break;
-               case ($this->isOwnFish($r)) :
-                   $this->setStage(self::FISHES);
-                   break;
-               // Two step parsing due to rows including first the player name and then the fishies
-               // Note that the player name is without country or team tags! Bloody stupid!
-               case ($this->getStage() === self::FISHES && $this->isFishesPlayer($r) && $this->isBiggestFish($r) === false) :
-                   $playerName = $this->fishesPlayer($r);
-                   break;
-               case ($this->getStage() === self::FISHES && $this->isBiggestFish($r) === false) :
-                   $player = $this->buddy->getPlayer($playerName[1]);
-                   $fishDetails = $this->fishForPlayer($r);
-                   $player->setFishes($this->buddy->getRound(), $fishDetails);
-                   break;
-               case ($this->getStage() === self::FISHES && $this->isBiggestFish($r)) :
-                   $this->setStage(self::BIGGEST);
-                   break;
-               case ($this->getStage() == self::BIGGEST) :
-                   $biggest = $this->getBiggest($r);
-                   $lake->setBiggestFish($biggest);
-                   $this->setStage(self::IRRELEVANT);
-                   break;
+                case $this->abandonRound($r) && $this->getStage() == self::IRRELEVANT :
+                    echo "ABANDON\n";
+                    $this->removeRound();
+                    $this->setStage(self::SKIP_UNTILL_NEW_ROUND);
+                    break;
+                case $this->getStage() == self::SKIP_UNTILL_NEW_ROUND && !$this->isNewRound($r):
+                    echo "DO NOTHING\n";
+                    // Do nothing
+                    break;
+                case $this->isNewRound($r) || ($this->buddy->getRound() < $rounds || $rounds === 0):
+                    echo "NEW ROUND\n";
+                    $this->setStage(self::IRRELEVANT);
+                    $lakeInformation = $this->getLake($r);
+                    $lake = $this->buddy->newLake();
+                    $lake->setRoundNumber($this->buddy->getRound());
+                    $lake->setName($lakeInformation[1]);
+                    $lake->setIngameTime($lakeInformation[2]);
+                    $lake->setRoundLength($lakeInformation[3]);
+                    $lake->setGameType($lakeInformation[4]);
+                    $lake->setRealTime($lakeInformation[5]);
+                    $lake->setPoints($this->buddy->getPoints($this->buddy->getRound()));
+                    $lake->setBiggestPoints($this->buddy->getBiggestPoints($this->buddy->getRound()));
+                    break;
+                case $this->isFinished($r):
+                    $this->setStage(self::RESULTS);
+                    break;
+                case ($this->getStage() === self::RESULTS && $this->isResult($r)):
+                    $plr = $this->getPlayerDetails($r);
+                    if (!$player = $this->buddy->getPlayer($plr[3])) {
+                        $player = $this->buddy->newPlayer($plr[3]);
+                    }
+                    $lake->setPlayer($player);
+                    $player->setPosition($this->buddy->getRound(), $plr[1]);
+                    $player->setTeam($plr[2]);
+                    $player->setName($plr[3]);
+                    $player->setScore($this->buddy->getRound(), $plr[4]);
+                    $player->setCountry($plr[5]);
+                    break;
+                case ($this->isOwnFish($r)) :
+                    $this->setStage(self::FISHES);
+                    break;
+                // Two step parsing due to rows including first the player name and then the fishies
+                // Note that the player name is without country or team tags! Bloody stupid!
+                case ($this->getStage() === self::FISHES && $this->isFishesPlayer($r) && $this->isBiggestFish($r) === false) :
+                    $playerName = $this->fishesPlayer($r);
+                    break;
+                case ($this->getStage() === self::FISHES && $this->isBiggestFish($r) === false) :
+                    $player = $this->buddy->getPlayer($playerName[1]);
+                    $fishDetails = $this->fishForPlayer($r);
+                    $player->setFishes($this->buddy->getRound(), $fishDetails);
+                    break;
+                case ($this->getStage() === self::FISHES && $this->isBiggestFish($r)) :
+                    $this->setStage(self::BIGGEST);
+                    break;
+                case ($this->getStage() == self::BIGGEST) :
+                    $biggest = $this->getBiggest($r);
+                    $lake->setBiggestFish($biggest);
+                    $this->setStage(self::IRRELEVANT);
+                    break;
             }
         }
     }
