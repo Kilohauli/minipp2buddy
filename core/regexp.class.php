@@ -17,7 +17,7 @@ class miniRegexp {
     // Catches biggest fish heading
     const BIGGEST_FISH = 'Isoin kala:';
     // Catches lake, time and so on from server side playlog
-    const NEW_ROUND = 'New LAN SERVER';
+    const NEW_ROUND_HOST = 'New LAN SERVER';
     // Catches lake, time and so on from client side playlog
     const NEW_ROUND_SELF = 'New LAN CLIENT';
     // Begin row processing after this row
@@ -133,7 +133,7 @@ class miniRegexp {
     }
     
     public function isNewRound($row) {
-        if (strpos($row, self::NEW_ROUND) === 0 || strpos($row, self::NEW_ROUND_SELF) === 0) {
+        if (strpos($row, self::NEW_ROUND_HOST) === 0 || strpos($row, self::NEW_ROUND_SELF) === 0) {
             return true;
         }
         return false;

@@ -1,7 +1,7 @@
 <?php
 
 class miniPPBuddy {
-    protected $config = array();
+    protected $_config = array();
     
     /**
      * @var miniRegexp miniRegexp class
@@ -49,10 +49,16 @@ class miniPPBuddy {
      */
     private $finalResults = array();
     
+    private $_renderer = '';
+    
     public function __construct($config) {
         $this->sanitize();
         // Currently not in use
         $this->config = array_merge($this->config, $config);
+    }
+    
+    public function getConfig() {
+        return $this->_config;
     }
     
     /**
@@ -78,6 +84,11 @@ class miniPPBuddy {
     }
     
     public function getRenderer() {
+        if (!class_exists('miniRender')) {
+            require_once dirname(__FILE__) . '/render.class.php';
+        }
+        $this->_renderer = new miniRender($this, $this->_config);
+        return $this->_renderer;
         
     }
 
