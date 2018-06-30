@@ -10,6 +10,8 @@ class miniPlayer {
     protected $scores = array();
     protected $fishes = array();
     
+    private $_parsingPlayer = false;
+    
     public function __construct(miniPPBuddy &$buddy) {
         $this->buddy = $buddy;
     }
@@ -38,6 +40,10 @@ class miniPlayer {
      * @param integer $position
      */
     public function setPosition($lake, $position) {
+        if (strpos($position, '*') === 0) {
+            $position = str_replace('*', '', $position);
+            $this->_parsingPlayer = true;
+        }
         $this->positions[$lake] = $position;
     }
     
@@ -51,6 +57,9 @@ class miniPlayer {
         $this->scores[$lake] = $score;
     }
     
+    public function getScore($lake) {
+        return $this->scores[$lake];
+    }
     /**
      * Set individual fish species with their score per lake
      * 
@@ -68,6 +77,10 @@ class miniPlayer {
     
     public function getFishes($lake) {
         return $this->fishes[$lake];
+    }
+    
+    public function isParser() {
+        return $this->_parsingPlayer;
     }
     
     public function debug() {

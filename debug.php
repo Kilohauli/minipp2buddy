@@ -20,16 +20,16 @@ $buddy->setPoints($scoresDummy);
 $buddy->setBiggestPoints($biggestDummy);
 $exp = $buddy->getRegexp();
 $buddy->setRounds(1);
-$f = file_get_contents('./score_demo.txt');
-
+$f = file_get_contents('./score_demo2.txt');
 $exp->setFile($f);
 
 $exp->process();
 
 $lakes = $buddy->getLakes();
 
+$scores = array();
 foreach ($lakes as $key => $lake) {
     $scores[] = $lake->process();
 }
 
-$buddy->finalScore($scores);
+print_r($scores);

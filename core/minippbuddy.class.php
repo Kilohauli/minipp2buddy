@@ -54,7 +54,7 @@ class miniPPBuddy {
     public function __construct($config) {
         $this->sanitize();
         // Currently not in use
-        $this->config = array_merge($this->config, $config);
+        $this->config = array_merge($this->_config, $config);
     }
     
     public function getConfig() {
@@ -135,11 +135,30 @@ class miniPPBuddy {
     }
     
     /**
+     * 
+     * @param int $round
+     * @return boolean
+     */
+    public function removeLake($round) {
+        $this->lakes[$round] = '';
+        return true;
+    }
+    /**
      * Get current round number
      * @return int
      */
     public function getRound() {
         return $this->currentRound;
+    }
+    
+    /**
+     * Set round manually, used to reset abandoned rounds
+     * @param int $round
+     * @return boolean
+     */
+    public function setRound($round) {
+        $this->currentRound = $round;
+        return true;
     }
     
     /**

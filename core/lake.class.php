@@ -13,8 +13,9 @@ class miniLake {
     private $players = array();
     private $round = 0;
     private $biggestFish = array();
-    
     private $endScores = array();
+    private $disqualifiedPlayers = array(); // MOST LIKELY TO BE REMOVED
+    
     /**
      * There is no actual round objects as lake does the same job, the scores
      * from web configuration are passed directly to lake
@@ -77,6 +78,19 @@ class miniLake {
         return $this->players;
     }
     
+/*    public function setDisqualifiedPlayer($name) {  MOST LIKELY TO BE REMOVED
+        if (!array_key_exists($this->buddy->strip($name), $this->disqualifiedPlayers)) {
+            $this->disqualifiedPlayers[$this->buddy->strip($name)] = true;
+        }
+    }
+    
+    public function isDisqualified($name) {
+        if (array_key_exists($this->buddy->strip($name), $this->disqualifiedPlayers)) {
+            return true;
+        }
+        return false;
+    }
+ */
     /**
      * Set biggest for round/lake
      * @param array $biggest
@@ -102,10 +116,13 @@ class miniLake {
                  * $this->players array */
                 break;
             }
-            $this->endScores[$this->buddy->strip($this->players[$key]->getName())] = array(
-                'name' => $this->players[$key]->getName(),
-                'points' => (int) $point
-            );
+            if ($this->players[$key]->getScore($this->round) > 0) {
+                $this->endScores[$this->buddy->strip($this->players[$key]->getName())] = array(
+                    'name' => $this->players[$key]->getName(),
+                    'points' => (int) $point
+                );
+            }
+
         }
         if (array_key_exists($this->biggestFish['key'], $this->endScores)) {
             $this->endScores[$this->biggestFish['key']]['points'] += (int) $this->pointsFish;

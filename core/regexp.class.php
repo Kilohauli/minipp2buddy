@@ -30,7 +30,6 @@ class miniRegexp {
     const LEAVE = '<--';
     // Skip new game line
     const NEW_GAME = '---------------';
-    
     // Break out from whole loop when game abandoned
     const ABANDON = 'Competition aborted';
     
@@ -107,6 +106,13 @@ class miniRegexp {
     private $file = null;
     // File contents split to rows
     private $rows = null;
+    
+    /**
+     * Set player with asterisk (*) as parsing player to identify "Omat kalat"
+     * to know who to set the fishies to later on
+     * @var string player name
+     */
+    private $_parsingPlayer = null;
     /**
      * 
      * @param miniPPBuddy $buddy
@@ -187,10 +193,7 @@ class miniRegexp {
     public function getLake($row) {
         // NetBeans complains for uninitialized variables
         $matches = null;
-        echo $row . "\n";
         preg_match(self::LAKE_INFORMATION, $row, $matches);
-        print_r($matches);
-        die();
         return $matches;
     }
     
@@ -239,6 +242,13 @@ class miniRegexp {
         return false;
     }
     
+/*    public function isDisqualified($row) { MOST LIKELY TO BE REMOVED
+        if (preg_match(self::DISQUALIFIED, $row)) {
+            return true;
+        }
+        return false;
+    }
+*/    
     public function isOwnFish($row) {
         if (strpos($row, self::SKIP_OWN) === 0) {
             return true;
@@ -247,7 +257,7 @@ class miniRegexp {
     }
     
     public function isFishesPlayer($row) {
-        if (preg_match(self::FISHES_PLAYER_NAME, $row)) {
+        if (preg_match(self::FISHES_PLAYER_NAME, $row) && !$this->isOwnFish($row)) {
             return true;
         }
         return false;
@@ -294,16 +304,13 @@ class miniRegexp {
             
             switch (true) {
                 case $this->abandonRound($r) && $this->getStage() == self::IRRELEVANT :
-                    echo "ABANDON\n";
                     $this->removeRound();
                     $this->setStage(self::SKIP_UNTILL_NEW_ROUND);
                     break;
                 case $this->getStage() == self::SKIP_UNTILL_NEW_ROUND && !$this->isNewRound($r):
-                    echo "DO NOTHING\n";
                     // Do nothing
                     break;
                 case $this->isNewRound($r) || ($this->buddy->getRound() < $rounds || $rounds === 0):
-                    echo "NEW ROUND\n";
                     $this->setStage(self::IRRELEVANT);
                     $lakeInformation = $this->getLake($r);
                     $lake = $this->buddy->newLake();
@@ -330,9 +337,13 @@ class miniRegexp {
                     $player->setName($plr[3]);
                     $player->setScore($this->buddy->getRound(), $plr[4]);
                     $player->setCountry($plr[5]);
+                    if ($player->isParser()) {
+                        $this->_parsingPlayer = $player->getName();
+                    }
                     break;
                 case ($this->isOwnFish($r)) :
                     $this->setStage(self::FISHES);
+                    $playerName = $this->buddy->getPlayer($this->_parsingPlayer)->getName();
                     break;
                 // Two step parsing due to rows including first the player name and then the fishies
                 // Note that the player name is without country or team tags! Bloody stupid!
@@ -340,7 +351,12 @@ class miniRegexp {
                     $playerName = $this->fishesPlayer($r);
                     break;
                 case ($this->getStage() === self::FISHES && $this->isBiggestFish($r) === false) :
-                    $player = $this->buddy->getPlayer($playerName[1]);
+                    if (is_array($playerName)) {
+                        $player = $this->buddy->getPlayer($playerName[1]);
+                    } else {
+                        $player = $this->buddy->getPlayer($playerName);
+                    }
+                    
                     $fishDetails = $this->fishForPlayer($r);
                     $player->setFishes($this->buddy->getRound(), $fishDetails);
                     break;
