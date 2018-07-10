@@ -1,8 +1,8 @@
 <?php
 
 require_once('./core/minippbuddy.class.php');
-
-$buddy = new miniPPBuddy(array());
+$config = require_once dirname(__FILE__) . '/config/config.php';
+$buddy = new miniPPBuddy($config);
 
 /**
  * Mimic the parameters passed from the website for round scores
@@ -24,12 +24,4 @@ $f = file_get_contents('./score_demo2.txt');
 $exp->setFile($f);
 
 $exp->process();
-
-$lakes = $buddy->getLakes();
-
-$scores = array();
-foreach ($lakes as $key => $lake) {
-    $scores[] = $lake->process();
-}
-
-print_r($scores);
+print_r($buddy->finalScore());

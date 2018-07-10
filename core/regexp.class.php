@@ -119,6 +119,7 @@ class miniRegexp {
      */
     public function __construct(miniPPBuddy &$buddy) {
         $this->buddy = $buddy;
+        $this->setStage(self::IRRELEVANT);
     }
     
     public function setFile($fileContents) {
@@ -298,20 +299,17 @@ class miniRegexp {
         foreach ($this->rows as $r) {
             $this->currentLine++;
             $r = trim($r);
-            if ($this->isEmpty($r) || $this->isSkip($r)) {
+            if ($this->isEmpty($r) || $this->isSkip($r) ||
+                    $this->getStage() == self::SKIP_UNTILL_NEW_ROUND && !$this->isNewRound($r)) {
                 continue;
             }
             
+
             switch (true) {
-                case $this->abandonRound($r) && $this->getStage() == self::IRRELEVANT :
-                    $this->removeRound();
+                case $this->abandonRound($r):
                     $this->setStage(self::SKIP_UNTILL_NEW_ROUND);
                     break;
-                case $this->getStage() == self::SKIP_UNTILL_NEW_ROUND && !$this->isNewRound($r):
-                    // Do nothing
-                    break;
-                case $this->isNewRound($r) || ($this->buddy->getRound() < $rounds || $rounds === 0):
-                    $this->setStage(self::IRRELEVANT);
+                case $this->isNewRound($r) && ($this->buddy->getRound() < $rounds || $rounds === 0):
                     $lakeInformation = $this->getLake($r);
                     $lake = $this->buddy->newLake();
                     $lake->setRoundNumber($this->buddy->getRound());
@@ -356,7 +354,6 @@ class miniRegexp {
                     } else {
                         $player = $this->buddy->getPlayer($playerName);
                     }
-                    
                     $fishDetails = $this->fishForPlayer($r);
                     $player->setFishes($this->buddy->getRound(), $fishDetails);
                     break;
@@ -367,6 +364,9 @@ class miniRegexp {
                     $biggest = $this->getBiggest($r);
                     $lake->setBiggestFish($biggest);
                     $this->setStage(self::IRRELEVANT);
+                    if ($this->buddy->getRound() == $rounds) { // Fix issue for loop going too far to next rounds individual fishies
+                        break 2;
+                    }
                     break;
             }
         }

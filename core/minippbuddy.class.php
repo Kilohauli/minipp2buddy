@@ -51,22 +51,15 @@ class miniPPBuddy {
     
     private $_renderer = '';
     
+    private $_request = '';
+    
     public function __construct($config) {
-        $this->sanitize();
         // Currently not in use
-        $this->config = array_merge($this->_config, $config);
+        $this->_config = array_merge($this->_config, $config);
     }
     
     public function getConfig() {
         return $this->_config;
-    }
-    
-    /**
-     * Sanitize _GET and _POST
-     */
-    public function sanitize() {
-        $_GET = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
-        $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
     }
     
     /**
@@ -86,12 +79,25 @@ class miniPPBuddy {
     public function getRenderer() {
         if (!class_exists('miniRender')) {
             require_once dirname(__FILE__) . '/render.class.php';
+            $this->_renderer = new miniRender($this, $this->_config);
         }
-        $this->_renderer = new miniRender($this, $this->_config);
+        
         return $this->_renderer;
         
     }
 
+    /**
+     * 
+     * @return miniRequest
+     */
+    public function getRequest() {
+        if(!class_exists('miniRequest')) {
+            require_once dirname(__FILE__) . '/request.class.php';
+            $this->_request = new miniRequest($this);
+        }
+        return $this->_request;
+    }
+    
     /**
      * Remove odd characters for array keys
      * Characters include scandic ä, ö, å and so on
@@ -166,7 +172,11 @@ class miniPPBuddy {
      * @param int $rounds
      */
     public function setRounds($rounds) {
-        $this->rounds = $rounds;
+        if ($rounds > 0 && $rounds <= $this->_config['max_rounds']) {
+            $this->rounds = $rounds;
+        } else {
+            $this->rounds = $this->_config['max_rounds'];
+        }
     }
     
     /**
@@ -284,7 +294,11 @@ class miniPPBuddy {
         return $this->biggestPoints[$round];
     }
     
-    public function finalScore($scores) {
+    public function finalScore() {
+        $lakes = $this->getLakes();
+        foreach ($lakes as $key => $lake) {
+            $scores[] = $lake->process();
+        }
         $finalScore = array();
         foreach ($scores as $key => $score) {
             foreach($score as $id => $result) {

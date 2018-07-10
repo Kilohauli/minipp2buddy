@@ -83,14 +83,21 @@ class miniLake {
             $this->disqualifiedPlayers[$this->buddy->strip($name)] = true;
         }
     }
+    */
     
-    public function isDisqualified($name) {
-        if (array_key_exists($this->buddy->strip($name), $this->disqualifiedPlayers)) {
+    /**
+     * Check if player did not finish. Currently used in end processing to check
+     * if players individual fishes should be reported
+     * @param string $name
+     * @return boolean
+     */
+    public function dnf($name) {
+        if (!array_key_exists($name, $this->endScores)) {
             return true;
         }
         return false;
     }
- */
+ 
     /**
      * Set biggest for round/lake
      * @param array $biggest
@@ -133,6 +140,20 @@ class miniLake {
             );
         }
         return $this->endScores;
+    }
+    
+    public function getOutput() {
+        return array(
+            'scores' => $this->endScores,
+            'currentRound' => $this->round,
+            'name' => $this->lakeName,
+            'ingametime' => $this->ingameTime,
+            'length' => $this->roundLength,
+            'type' => $this->gameType,
+            'real' => $this->realTime,
+            'biggestFishPoints' => $this->pointsFish,
+            'BiggestFish' => $this->biggestFish,
+        );
     }
     
     public function debug() {

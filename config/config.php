@@ -5,8 +5,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-define(BUDDY_ROOT_PATH, dirname(dirname(__FILE__)) . "/");
-define(BYDDY_CORE_PATH, BUDDY_ROOT_PATH . "/core/");
+$root = dirname(dirname(__FILE__));
+define("BUDDY_ROOT_PATH",  $root . "/");
+define("BYDDY_CORE_PATH", BUDDY_ROOT_PATH . "/core/");
 
 
 $config = array(
@@ -25,7 +26,8 @@ $config = array(
         'global_header' => 'header',
         'global_footer' => 'footer',
         
-    )
+    ),
+    'max_rounds' => 10
 );
 
 return $config;
