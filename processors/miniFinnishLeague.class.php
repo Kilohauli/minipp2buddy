@@ -41,20 +41,25 @@ class miniFinnishLeague extends miniProcessor {
         return $this->_teams;
     }
 
-    protected function calculateLeagueScore($team1, $team2) {
+    protected function calculateLeagueScore($round) {
+        $teamKeys = array_keys($this->_teams);
+        
         
     }
 
     public function output($format = 'array') {
-        
-        
         $this->calculate();
+
         // Output array which collects all the data
         $out = array();
-        
+        print_r($this->_teams);die();
         foreach($this->_lakes as $index => $lake) {
-            print_r($lake->getOutput());
+            $out[$index] = array(
+                'league_score' => $this->calculateLeagueScore($index)
+            );
+            $out[$index] = array_merge($out[$index], $lake->getLakeDetail());
         }
+        print_r($out);
         die();  
         if ($format === 'json') {
             $out = json_encode($out);
