@@ -117,8 +117,8 @@ class miniPPBuddy {
     public function strip($string) {
         return (string) strtolower(
             str_replace(
-                    array("[", "]", 'ä', 'ö', 'å', 'Ä', 'Ö', 'Å', ' ', '(', ')', '-'), 
-                    array('', '', 'a', 'o', 'a', 'A', 'O', 'A', '', '', '', '_'), 
+                    array("[", "]", 'ä', 'ö', 'å', 'Ä', 'Ö', 'Å', ' ', '(', ')', '-', '*'), 
+                    array('', '', 'a', 'o', 'a', 'A', 'O', 'A', '', '', '', '_', ''), 
                         $string));
     }
     
@@ -244,6 +244,14 @@ class miniPPBuddy {
     }
     
     /**
+     * Get all players regardless of round (eases zero score output if needed)
+     * @return array|miniPlayer
+     */
+    public function getAllPlayers() {
+        return $this->players;
+    }
+    
+    /**
      * Set points for player results
      * @param array|string $points
      */
@@ -327,16 +335,5 @@ class miniPPBuddy {
         }
         arsort($finalScore, SORT_NUMERIC);
         return $finalScore;
-    }
-    
-    /**
-     * Return processor which calculates the score
-     * @param type $processorName
-     * @return miniProcessor
-     */
-    public function getProcessor($processorName) {
-        
-        
-        return $processor;
     }
 }
