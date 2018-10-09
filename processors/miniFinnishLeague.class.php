@@ -4,9 +4,9 @@ if (!class_exists('miniProcessor')) {
     require_once dirname(__FILE__) . '/miniProcessor.class.php';
 }
 
-class miniTeamProcessor extends miniProcessor {
+class miniFinnishLeague extends miniProcessor {
     protected $_teams = array();
-    
+
     public function __construct(\miniPPBuddy &$buddy) {
         parent::__construct($buddy);
     }
@@ -41,14 +41,26 @@ class miniTeamProcessor extends miniProcessor {
         return $this->_teams;
     }
 
+    protected function calculateLeagueScore($team1, $team2) {
+        
+    }
+
     public function output($format = 'array') {
+        
+        
         $this->calculate();
+        // Output array which collects all the data
         $out = array();
         
-        
+        foreach($this->_lakes as $index => $lake) {
+            print_r($lake->getOutput());
+        }
+        die();  
         if ($format === 'json') {
             $out = json_encode($out);
         }
+        
+        return $out;
     }
     
     /**

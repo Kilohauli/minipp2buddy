@@ -31,7 +31,7 @@ $config = array(
     'processor_path' => BUDDY_ROOT_PATH . "processors/",
     'controller_path' => BUDDY_ROOT_PATH . "controllers/",
     // This is just for simplified installations
-    'force_processor' => 'miniTeamProcessor',
+    'force_processor' => 'miniFinnishLeague',
     'force_controller' => 'ppIndexController'
 );
 

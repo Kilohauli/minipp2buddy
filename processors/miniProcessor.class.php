@@ -55,7 +55,7 @@ abstract class miniProcessor {
      * Returns final output
      * Formats array (default) and json
      * @param string $format 
-     * @return array
+     * @return array|string
      */
     abstract protected function output($format);
     
