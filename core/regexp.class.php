@@ -113,6 +113,7 @@ class miniRegexp {
      * @var string player name
      */
     private $_parsingPlayer = null;
+    
     /**
      * 
      * @param miniPPBuddy $buddy

@@ -4,7 +4,7 @@ class miniPlayer {
     private $buddy = false;
     
     protected $name = '';
-    protected $team = '';
+    protected $team = null;
     protected $country = '';
     protected $positions = array();
     protected $scores = array();
@@ -23,8 +23,24 @@ class miniPlayer {
     public function getName() {
         return $this->name;
     }
+    
+    /**
+     * Set team and remove [] characters
+     * @param string $team
+     */
     public function setTeam($team) {
-        $this->team = $team;
+        $this->team = trim($team, "[] ");
+    }
+    
+    /**
+     * 
+     * @return boolean|string
+     */
+    public function getTeam() {
+        if ($this->team === null) {
+            return false;
+        }
+        return $this->team;
     }
     
     public function setCountry($country) {

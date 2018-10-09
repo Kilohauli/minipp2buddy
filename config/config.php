@@ -27,7 +27,12 @@ $config = array(
         'global_footer' => 'footer',
         
     ),
-    'max_rounds' => 10
+    'max_rounds' => 10,
+    'processor_path' => BUDDY_ROOT_PATH . "processors/",
+    'controller_path' => BUDDY_ROOT_PATH . "controllers/",
+    // This is just for simplified installations
+    'force_processor' => 'miniTeamProcessor',
+    'force_controller' => 'ppIndexController'
 );
 
 return $config;

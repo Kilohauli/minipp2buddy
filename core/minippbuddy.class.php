@@ -58,8 +58,19 @@ class miniPPBuddy {
         $this->_config = array_merge($this->_config, $config);
     }
     
-    public function getConfig() {
-        return $this->_config;
+    /**
+     * 
+     * @param string $name
+     * @return mixed
+     */
+    public function getConfigKey($name) {
+        $vars = explode(".", $name);
+        if (count($vars) > 1) {
+            $config = $this->_config[$vars[0]][$vars[1]];
+        } else {
+            $config = $this->_config[$vars[0]];
+        }
+        return $config;
     }
     
     /**
@@ -260,7 +271,7 @@ class miniPPBuddy {
      * @param int $round
      * @return array
      */
-    public function getPoints($round) {
+    public function getPoints($round = 1) {
         if (count($this->points) == 1) {
             return $this->points[1];
         }
@@ -294,6 +305,10 @@ class miniPPBuddy {
         return $this->biggestPoints[$round];
     }
     
+    /**
+     * Calculates final scores, will be deprecated most likely
+     * @return array
+     */
     public function finalScore() {
         $lakes = $this->getLakes();
         foreach ($lakes as $key => $lake) {
@@ -312,5 +327,16 @@ class miniPPBuddy {
         }
         arsort($finalScore, SORT_NUMERIC);
         return $finalScore;
+    }
+    
+    /**
+     * Return processor which calculates the score
+     * @param type $processorName
+     * @return miniProcessor
+     */
+    public function getProcessor($processorName) {
+        
+        
+        return $processor;
     }
 }

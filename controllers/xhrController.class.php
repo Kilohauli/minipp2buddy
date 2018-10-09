@@ -11,6 +11,12 @@ if (!class_exists('ppIndexController')) {
 }
 
 class ppXHRController extends ppIndexController {
+    
+    /**
+     * Deprecated in some part of space and time for the 
+     * actual code inside the method
+     * @return array
+     */
     public function out() {
         $scores = $this->_buddy->finalScore();
         $lakes = $this->processLakesOutput();

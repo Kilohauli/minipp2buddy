@@ -3,3 +3,9 @@ UI
 - How many points for biggest fish
 - Comma separated list for points per final result position
 - Quick select drop down for typical point structures (sm-liiga etc...)
+
+Core
+- Rename all files and classes to match same patterns (camelCase etc...)
+- Loads of logging and error detection
+- Fix biggest fish to be checked from player fishes instead of using the
+    "Isoin kala:" due 'Most species' game type does not have anything in it

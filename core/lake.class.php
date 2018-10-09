@@ -14,7 +14,7 @@ class miniLake {
     private $round = 0;
     private $biggestFish = array();
     private $endScores = array();
-    private $disqualifiedPlayers = array(); // MOST LIKELY TO BE REMOVED
+    private $disqualifiedPlayers = array(); // MOST LIKELY TOBE REMOVED
     
     /**
      * There is no actual round objects as lake does the same job, the scores
@@ -100,6 +100,7 @@ class miniLake {
  
     /**
      * Set biggest for round/lake
+     * TODO: Rewrite whole method or replace with "setRealBiggestFish"
      * @param array $biggest
      */
     public function setBiggestFish($biggest) {
@@ -131,14 +132,18 @@ class miniLake {
             }
 
         }
-        if (array_key_exists($this->biggestFish['key'], $this->endScores)) {
+        // bubblegum fix to biggest fish missing in 'Most species' for now
+        if (!empty($this->biggestFish)) {
+            if (array_key_exists($this->biggestFish['key'], $this->endScores)) {
             $this->endScores[$this->biggestFish['key']]['points'] += (int) $this->pointsFish;
-        } else {
-            $this->endScores[$this->biggestFish['key']] = array(
-                'name' => $this->biggestFish['name'],
-                'points' => $this->pointsFish
-            );
+            } else {
+                $this->endScores[$this->biggestFish['key']] = array(
+                    'name' => $this->biggestFish['name'],
+                    'points' => $this->pointsFish
+                );
+            }
         }
+
         return $this->endScores;
     }
     
@@ -156,6 +161,19 @@ class miniLake {
         );
     }
     
+    /**
+     * Get lake details only
+     * @return array
+     */
+    public function getLakeDetail() {
+        return array(
+            'name' => $this->lakeName,
+            'ingametime' => $this->ingameTime,
+            'length' => $this->roundLength,
+            'type' => $this->gameType,
+            'real' => $this->realTime,
+        );
+    }
     public function debug() {
         print_r(array(
             'currentRound' => $this->round,

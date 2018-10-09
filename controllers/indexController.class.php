@@ -16,15 +16,36 @@ class ppIndexController {
     
     protected $_includeFishes = true;
     
+    /**
+     *
+     * @var miniProcessor
+     */
+    protected $_processor = false;
+    
     public function __construct(miniPPBuddy &$buddy, $request) {
         $this->_buddy = $buddy;
         $this->_request = $request;
+        
+        
     }
-    
+
+    /**
+     * Currently quick and dirty processor loading which uses force loading
+     * from configuration file property
+     * @return array
+     */
     public function out() {
+        if ($this->_processor === false) {
+            $this->getProcessor();
+        }
+        return $this->_processor->output();
         
     }
     
+    /**
+     * Will be deprecated more than likely
+     * @return array
+     */
     public function processLakesOutput() {
         $lakes = $this->_buddy->getLakes();
         
@@ -43,5 +64,43 @@ class ppIndexController {
         }
 
         return $this->_lakeOutput;
+    }
+    
+    /**
+     * Will contain switch->case for valid processors just in case of security
+     * But that is just for now
+     * @param string $processorName
+     * @return miniProcessor
+     */
+    public function getProcessor($processorName = '') {
+        if (!class_exists('miniProcessor')) {
+            require_once $this->_buddy->getConfigKey('processor_path') . "miniProcessor.class.php";
+        }
+        
+        if (!empty($this->_buddy->getConfigKey('force_processor'))) {
+            $processorName = $this->_buddy->getConfigKey('force_processor');
+        }
+        
+        $this->loadProcessor($processorName);
+
+        
+        switch ($processorName) {
+            case 'miniTeamProcessor' :
+                $this->_processor = new $processorName($this->_buddy);
+                break;
+            default :
+                break;
+        }
+        return $this->_processor;
+    }
+    
+    /**
+     * 
+     * @param string $processorName
+     */
+    protected function loadProcessor($processorName) {
+        if (!class_exists($processorName)) {
+            require_once $this->_buddy->getConfigKey('processor_path') . "{$processorName}.class.php";
+        }
     }
 }
