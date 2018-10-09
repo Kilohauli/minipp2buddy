@@ -49,7 +49,7 @@ class miniRegexp {
      * 4 = game type
      * 5 = real time
     */
-    const LAKE_INFORMATION = '/^[\s\w]*:\s+([\s\w-]*)\.\s+\((\d+\.\d+\.\s\d+:\d+)\/\s+(\d+)\s+min\s*\/\s+\w+\s\/\s+([\w+\s+,]*)\s+\/[\s\w+]*\)\s+\[([0-9]+\.[0-9]+\.[0-9]+\s[0-9]+:[0-9]+)\]/';
+    const LAKE_INFORMATION = '/^[\s\w]*:\s+([\s\w-äöÄÖÅ]*)\.\s+\((\d+\.\d+\.\s\d+:\d+)\/\s+(\d+)\s+min\s*\/\s+\w+\s\/\s+([\w+\s+,]*)\s+\/[\s\w+]*\)\s+\[([0-9]+\.[0-9]+\.[0-9]+\s[0-9]+:[0-9]+)\]/';
     
     /** Player information including with the country tag after name, was too lazy to build too complex regexp for now
      * 0 = whole line
