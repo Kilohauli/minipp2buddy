@@ -87,5 +87,24 @@ abstract class miniProcessor {
             ));
         }
     }
-
+    
+    /**
+     * Return list of biggest fishes
+     * @return array
+     */
+    protected function getBiggestFishes() {
+        foreach($this->_rounds as $key => $round) {
+            $biggest[] = array_merge($round['biggest'], array('team_strip' => $this->_buddy->strip($round['biggest']['team'])));
+        }
+        
+        return $biggest;
+    }
+    
+    protected function sortPlayers($sortA, $sortB) {
+        if ($sortA['total'] == $sortB['total']) {
+            return 0;
+        }
+        
+        return ($sortA['total'] < $sortB['total']) ? +1 : -1;
+    }
 }

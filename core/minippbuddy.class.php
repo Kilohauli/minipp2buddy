@@ -53,9 +53,12 @@ class miniPPBuddy {
     
     private $_request = '';
     
+    private $_lang = array();
+    
     public function __construct($config) {
         // Currently not in use
         $this->_config = array_merge($this->_config, $config);
+        $this->loadLanguageFile();
     }
     
     /**
@@ -117,8 +120,8 @@ class miniPPBuddy {
     public function strip($string) {
         return (string) strtolower(
             str_replace(
-                    array("[", "]", 'ä', 'ö', 'å', 'Ä', 'Ö', 'Å', ' ', '(', ')', '-', '*'), 
-                    array('', '', 'a', 'o', 'a', 'A', 'O', 'A', '', '', '', '_', ''), 
+                    array("[", "]", 'ä', 'ö', 'å', 'Ä', 'Ö', 'Å', ' ', '(', ')', '-', '*', ','), 
+                    array('', '', 'a', 'o', 'a', 'A', 'O', 'A', '', '', '', '_', '', ''), 
                         $string));
     }
     
@@ -335,5 +338,70 @@ class miniPPBuddy {
         }
         arsort($finalScore, SORT_NUMERIC);
         return $finalScore;
+    }
+    
+    /**
+     * 
+     * @return array
+     */
+    public function loadLanguageFile() {
+        $lang = $this->getConfigKey('language');
+        $language_path = $this->getConfigKey('language_path');
+        
+        $this->_lang = require_once($language_path.$lang.".php");
+        
+        return $this->_lang;
+    }
+    
+    /**
+     * Translate string, _lang keys are stripped original strings
+     * @param string $str
+     * @return string
+     */
+    public function translate($str) {
+        return $this->_lang[$this->strip($str)];
+    }
+    
+    /**
+     * Date to string
+     * @return string
+     */
+    public function dateToString($date) {
+        $date = explode(" ", $date);
+        $date = explode(".", $date[0]);
+        $str = '';
+        switch ($date[1]) {
+            case '1' :
+                $str = $this->translate('january') . " " . $date[0];
+                break;
+            case '3' :
+                $str = $this->translate('march') . " " . $date[0];
+                break;
+            case '11' :
+                $str = $this->translate('november') . " " . $date[0];
+                break;
+        }
+        return $str;
+    }
+    
+    public function timeToString($time) {
+        $time = explode(" ", $time);
+        $time = explode(":", $time[1]);
+        $str = '';
+        switch ($time[0]) {
+            case '9' :
+                $str = $this->translate('morning');
+                break;
+            case '12' :
+                $str = $this->translate('midday');
+                break;
+            case '14' :
+                $str = $this->translate('evening');
+                break;
+            case '18' :
+                $str = $this->translate('night') . " " . $date[0];
+                break;
+        }
+        return $str;
     }
 }

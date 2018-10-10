@@ -30,9 +30,11 @@ $config = array(
     'max_rounds' => 10,
     'processor_path' => BUDDY_ROOT_PATH . "processors/",
     'controller_path' => BUDDY_ROOT_PATH . "controllers/",
+    'language_path' => BUDDY_ROOT_PATH . "languages/",
     // This is just for simplified installations
     'force_processor' => 'miniFinnishLeague',
-    'force_controller' => 'ppIndexController'
+    'force_controller' => 'ppIndexController',
+    'language' => 'finnish'
 );
 
 return $config;
