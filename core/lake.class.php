@@ -169,11 +169,15 @@ class miniLake {
         return array(
             'name' => $this->lakeName,
             'ingametime' => $this->ingameTime,
+            'ingametime_season' => $this->buddy->dateToString($this->ingameTime),
+            'ingametime_day_time' => $this->buddy->timeToString($this->ingameTime),
             'length' => $this->roundLength,
             'type' => $this->gameType,
+            'type_trans' => $this->buddy->translate(trim($this->gameType)),
             'real' => $this->realTime,
         );
     }
+    
     public function debug() {
         print_r(array(
             'currentRound' => $this->round,

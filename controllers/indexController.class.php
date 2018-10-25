@@ -83,14 +83,7 @@ class ppIndexController {
         
         $this->loadProcessor($processorName);
 
-        
-        switch ($processorName) {
-            case 'miniTeamProcessor' :
-                $this->_processor = new $processorName($this->_buddy);
-                break;
-            default :
-                break;
-        }
+        $this->_processor = new $processorName($this->_buddy);
         return $this->_processor;
     }
     

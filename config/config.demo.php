@@ -34,7 +34,12 @@ $config = array(
     // This is just for simplified installations
     'force_processor' => 'miniFinnishLeague',
     'force_controller' => 'ppIndexController',
-    'language' => 'finnish'
+    'language' => 'finnish',
+    'db' => array( // Will add proper ORM (xPDO, Propel) have to see
+        'name' => '',
+        'user' => '',
+        'passwd' => ''
+    )
 );
 
 return $config;

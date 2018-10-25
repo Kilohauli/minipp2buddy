@@ -11,7 +11,7 @@ class miniTeamProcessor extends miniProcessor {
         parent::__construct($buddy);
     }
     
-    public function calculate() {
+    protected function calculate() {
         foreach($this->_lakes as $index => $lake) {
             $processed = $lake->process();
             $this->_currentRound = $index;
@@ -43,23 +43,13 @@ class miniTeamProcessor extends miniProcessor {
 
     public function output($format = 'array') {
         $this->calculate();
-        return $this->_teams;
-    }
-    /* Deprecated during first hour
-    protected function playerToTeam(miniPlayer &$player) {
-        $teamStripped = $this->_buddy->strip($player->getTeam());
-        $playerStripped = $this->_buddy->strip($player->getName());
+        $out = array();
         
-        if (!array_key_exists($teamStripped, $this->_teams)) {
-            $this->teamSkeleton($teamStripped, $player->getTeam());
-        }
         
-        if (!array_key_exists($playerStripped, $this->_teams[$teamStripped]['players'])) {
-            $this->playerSkeleton($player);
+        if ($format === 'json') {
+            $out = json_encode($out);
         }
-
     }
-    */
     
     /**
      * Add points to teams total score
