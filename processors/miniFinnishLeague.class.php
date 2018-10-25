@@ -24,14 +24,18 @@ class miniFinnishLeague extends miniProcessor {
     }
     
     protected function calculate() {
+        $plrTemp = array();
         foreach($this->_lakes as $index => $lake) {
             $processed = $lake->process();
             $this->_currentRound = $index;
 
             foreach($processed as $key => $player) {
-                $plrObj = $this->_buddy->getPlayer($player['name']);
-                
+                if(!$player['name']) {
+                    continue;
+                }
                 $plrName = $player['name'];
+                $plrTemp[$this->_currentRound][] = $this->_buddy->strip($plrName);
+                $plrObj = $this->_buddy->getPlayer($player['name']);
                 $plrTeam = $plrObj->getTeam();
                 $plrTeamStripped = $this->_buddy->strip($plrTeam);
                 
@@ -45,10 +49,41 @@ class miniFinnishLeague extends miniProcessor {
                 if (!$this->playerExists($plrName, $plrTeam)) {
                     $this->playerSkeleton($plrObj);
                 }
-                
+
+                $this->addPlayerLakeResult($plrObj);
+                $this->addPlayerFishes($plrObj);
                 $this->addTeamPoints($plrTeamStripped, $player['points']);
                 $this->addPlayerPoints($plrObj, $player['points']);
+                $this->playedLake($plrObj);
             }
+        }
+        //$zeroScoringPlayers = $this->getZeroScoringPlayers();
+        
+        foreach($this->_lakes as $index => $lake) {
+            $players = $lake->getPlayers();
+            foreach($players as $key => $plrObj) {
+
+                $playerStripped = $this->_buddy->strip($plrObj->getName());
+                if (in_array($playerStripped, $plrTemp[$index]) && $this->playerSkeleton($plrObj)) {
+                    continue;
+                }
+                $this->playerSkeleton($plrObj);
+                $this->addPlayerLakeResult($plrObj, $index);
+                $this->addPlayerFishes($plrObj, $index);
+                $this->playedLake($plrObj, $index);
+            } 
+            /*foreach($zeroScoringPlayers as $key => $plrObj) {
+                echo "FOUND ZERO: " . $plrObj->getName() . " - ROUND: " . $index . "\n";
+                $playerStripped = $this->_buddy->strip($plrObj->getName());
+                if (in_array($playerStripped, $plrTemp[$index])) {
+                    echo "FOUND: " . $playerStripped . "\n";
+                    continue;
+                }
+                echo "ZERO: " . $plrObj->getName() . "\n";
+                $this->playerSkeleton($plrObj);
+                $this->addPlayerLakeResult($plrObj, $index);
+                $this->addPlayerFishes($plrObj, $index);
+            }*/
         }
         return $this->_teams;
     }
@@ -84,12 +119,8 @@ class miniFinnishLeague extends miniProcessor {
 
     public function output($format = 'array') {
         $this->calculate();
-        // Add rest of the players who have no scores
-        $zeroScoringPlayers = $this->getZeroScoringPlayers();
-        foreach($zeroScoringPlayers as $key => $plrObj) {
-            $this->playerSkeleton($plrObj);
-        }
-        
+        $lakeScore = array();
+
         $teamKeys = array_keys($this->_teams);
         
         // Output array which collects all the data
@@ -98,19 +129,20 @@ class miniFinnishLeague extends miniProcessor {
             $teamKeys[0] => 0,
             $teamKeys[1] => 0
         );
+
         
         foreach($this->_lakes as $index => $lake) {
-            $temp[$index] = array(
+            $temp['lakes'][$index] = array(
                 'league_score' => $this->calculateLeagueScore($teamKeys, $index),
                 'normal_score' => array(
                     $teamKeys[0] => $this->_teams[$teamKeys[0]]['lake_points'][$index],
                     $teamKeys[1] => $this->_teams[$teamKeys[1]]['lake_points'][$index]
                 )
             );
-            $finalScore[$teamKeys[0]] += (int) $temp[$index]['league_score'][$teamKeys[0]];
-            $finalScore[$teamKeys[1]] += (int) $temp[$index]['league_score'][$teamKeys[1]];
+            $finalScore[$teamKeys[0]] += (int) $temp['lakes'][$index]['league_score'][$teamKeys[0]];
+            $finalScore[$teamKeys[1]] += (int) $temp['lakes'][$index]['league_score'][$teamKeys[1]];
             
-            $temp[$index] = array_merge($temp[$index], $lake->getLakeDetail());
+            $temp['lakes'][$index] = array_merge($temp['lakes'][$index], $lake->getLakeDetail());
             
             $lakeScore[$teamKeys[0]];
             $lakeScore[$teamKeys[1]];
@@ -127,15 +159,12 @@ class miniFinnishLeague extends miniProcessor {
                 
         $temp['players'][$teamKeys[0]] = $this->_teams[$teamKeys[0]]['players'];
         $temp['players'][$teamKeys[1]] = $this->_teams[$teamKeys[1]]['players'];
-        print_r($temp);
-        // Zero score players splitting
-        $this->getZeroScoringPlayers();
         
         if ($format === 'json') {
-            $out = json_encode($out);
+            $temp = json_encode($temp);
         }
         
-        return $out;
+        return $temp;
     }
     
     /**
@@ -165,11 +194,36 @@ class miniFinnishLeague extends miniProcessor {
         }
         $teamStripped = $this->_buddy->strip($plrObj->getTeam());
         $playerStripped = $this->_buddy->strip($plrObj->getName());
+
         $this->_teams[$teamStripped]['players'][$playerStripped]['total'] += (int) $score;
         $this->_teams[$teamStripped]['players'][$playerStripped]['lake_points'][$this->_currentRound] = $score;
         
     }
     
+    /**
+     * Add fishes to players array
+     * @param type $plrObj
+     */
+    protected function addPlayerFishes($plrObj, $rnd = '') {
+        $teamStripped = $this->_buddy->strip($plrObj->getTeam());
+        $playerStripped = $this->_buddy->strip($plrObj->getName());
+        if ($rnd == '') {
+            $rnd = $this->_currentRound;
+        }
+
+        $this->_teams[$teamStripped]['players'][$playerStripped]['fishes'][$rnd] = $plrObj->getFishes($rnd);
+    }
+    
+    protected function addPlayerLakeResult($plrObj, $rnd = '') {
+        $teamStripped = $this->_buddy->strip($plrObj->getTeam());
+        $playerStripped = $this->_buddy->strip($plrObj->getName());
+
+        if ($rnd == '') {
+            $rnd = $this->_currentRound;
+        }
+
+        $this->_teams[$teamStripped]['players'][$playerStripped]['lake_score'][$rnd] = $plrObj->getScore($rnd);
+    }
     /**
      * Check if team is in the _team array
      * @param string $teamStripped
@@ -217,14 +271,22 @@ class miniFinnishLeague extends miniProcessor {
      * @param miniPlayer $plrObj
      */
     protected function playerSkeleton($plrObj) {
-        $teamStripped = $this->_buddy->strip($plrObj->getTeam());
         $plrName = $plrObj->getName();
         $playerStripped = $this->_buddy->strip($plrName);
+        $teamStripped = $this->_buddy->strip($plrObj->getTeam());
+        if ($this->playerExists($plrName, $plrObj->getTeam())) {
+            return true;
+        }
+
         $this->_teams[$teamStripped]['players'][$playerStripped] = array(
             'name' => $plrName,
             'total' => 0,
-            'lake_points' => array_fill(1, 3, 0)
+            'played' => array_fill(1, 3, 0),
+            'lake_points' => array_fill(1, 3, 0),
+            'lake_score' => array_fill(1, 3, 0),
+            'fishes' => array()
         );
+        return $this->_teams[$teamStripped]['players'][$playerStripped];
     }
     
     protected function getZeroScoringPlayers() {
@@ -236,5 +298,15 @@ class miniFinnishLeague extends miniProcessor {
             }
         }
         return $players;
+    }
+    
+    protected function playedLake($plrObj, $rnd = false) {
+        if (!$rnd) {
+            $rnd = $this->_currentRound;
+        }
+
+        $playerStripped = $this->_buddy->strip($plrObj->getName());
+        $teamStripped = $this->_buddy->strip($plrObj->getTeam());
+        $this->_teams[$teamStripped]['players'][$playerStripped]['played'][$rnd] = 1;
     }
 }

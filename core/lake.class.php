@@ -173,7 +173,7 @@ class miniLake {
             'ingametime_day_time' => $this->buddy->timeToString($this->ingameTime),
             'length' => $this->roundLength,
             'type' => $this->gameType,
-            'type_trans' => $this->buddy->translate($this->gameType),
+            'type_trans' => $this->buddy->translate(trim($this->gameType)),
             'real' => $this->realTime,
         );
     }

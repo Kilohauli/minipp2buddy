@@ -297,7 +297,12 @@ class miniRegexp {
         $lake = null;
         $player = null;
         $rounds = $this->buddy->getRounds();
+
         foreach ($this->rows as $r) {
+            if (!mb_detect_encoding($r, "UTF-8", true)) {
+                $r = utf8_encode($r);
+            }
+            
             $this->currentLine++;
             $r = trim($r);
             if ($this->isEmpty($r) || $this->isSkip($r) ||

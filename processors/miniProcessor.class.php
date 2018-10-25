@@ -85,6 +85,7 @@ abstract class miniProcessor {
                 'weight' => $fish['biggest'],
                 'fish' => $fish['fish']
             ));
+            
         }
     }
     
@@ -94,7 +95,11 @@ abstract class miniProcessor {
      */
     protected function getBiggestFishes() {
         foreach($this->_rounds as $key => $round) {
-            $biggest[] = array_merge($round['biggest'], array('team_strip' => $this->_buddy->strip($round['biggest']['team'])));
+            $biggest[$key] = array_merge($round['biggest'], array(
+                'team_strip' => $this->_buddy->strip($round['biggest']['team']),
+                'name_strip' => $this->_buddy->strip($round['biggest']['name'])
+                )
+            );
         }
         
         return $biggest;

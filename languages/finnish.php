@@ -22,7 +22,7 @@ $lang = array(
     'biggestpike' => 'Suurin hauki',
     'onlyzander' => 'Vain kuha',
     'biggestzander' => 'Suurin kuha',
-    'onlycarpfamily' => 'Vain särkikalat',
+    'carpfamilyfish' => 'Vain särkikalat',
     'onlycarpfamilyquantity' => 'Vain särkikalat, kappalemäärä',
     'biggestcarpfamily' => 'Suurin särkikala',
     'threebiggestfish' => 'Kolme suurinta kalaa',
@@ -43,3 +43,4 @@ $lang = array(
 );
 
 return $lang;
+

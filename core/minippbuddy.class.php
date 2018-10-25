@@ -53,7 +53,13 @@ class miniPPBuddy {
     
     private $_request = '';
     
-    private $_lang = array();
+    private $_lang = null;
+    
+    /**
+     *
+     * @var miniDB
+     */
+    private $_connection = null;
     
     public function __construct($config) {
         // Currently not in use
@@ -136,8 +142,7 @@ class miniPPBuddy {
     public function debug() {
         print_r(array(
             array_keys($this->lakes),
-            array_keys($this->players),
-            $this->biggestFishes
+            array_keys($this->players)
         ));
     }
     
@@ -347,9 +352,7 @@ class miniPPBuddy {
     public function loadLanguageFile() {
         $lang = $this->getConfigKey('language');
         $language_path = $this->getConfigKey('language_path');
-        
         $this->_lang = require_once($language_path.$lang.".php");
-        
         return $this->_lang;
     }
     
@@ -403,5 +406,17 @@ class miniPPBuddy {
                 break;
         }
         return $str;
+    }
+    
+    /**
+     * *Not quite right way to do this, but current timeline of project requires
+     * @return miniDB
+     */
+    public function connect() {
+        if (!class_exists('miniDB')) {
+            require_once(dirname(__FILE__).'/sql/db.class.php');
+        }
+        $this->_connection = new miniDB($this);
+        return $this->_connection;
     }
 }
