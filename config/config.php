@@ -7,7 +7,7 @@
  */
 $root = dirname(dirname(__FILE__));
 define("BUDDY_ROOT_PATH",  $root . "/");
-define("BYDDY_CORE_PATH", BUDDY_ROOT_PATH . "/core/");
+define("BUDDY_CORE_PATH", BUDDY_ROOT_PATH. "core/");
 
 
 $config = array(
@@ -34,7 +34,14 @@ $config = array(
     // This is just for simplified installations
     'force_processor' => 'miniFinnishLeague',
     'force_controller' => 'ppIndexController',
-    'language' => 'finnish'
+    'override_regexp_path' => BUDDY_ROOT_PATH . 'buddyconnect',
+    'override_regexp_class' => 'connectRegexp',
+    'language' => 'finnish',
+    'db' => array( // Will add proper ORM (xPDO, Propel) have to see
+        'name' => '',
+        'user' => '',
+        'passwd' => ''
+    )
 );
 
 return $config;

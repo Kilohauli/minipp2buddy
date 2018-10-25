@@ -6,7 +6,7 @@ class miniPPBuddy {
     /**
      * @var miniRegexp miniRegexp class
      */
-    protected $regex = null;
+    protected $_regexp = null;
     
     /**
      * @var boolean Enables console printing when set to true
@@ -79,6 +79,9 @@ class miniPPBuddy {
         } else {
             $config = $this->_config[$vars[0]];
         }
+        if (!$config) {
+            return false;
+        }
         return $config;
     }
     
@@ -87,13 +90,27 @@ class miniPPBuddy {
      * @return miniRegexp
      */
     public function getRegexp() {
-        if ($this->regex !== null) {
-            return $this->regex;
+        if ($this->_regexp !== null) {
+            return $this->_regexp;
+        } else if (!class_exists('miniRegexp')) {
+            require_once BUDDY_CORE_PATH . 'regexp.class.php';
         }
         
-        require_once dirname(__FILE__) . '/regexp.class.php';
-        $this->regex = new miniRegexp($this);
-        return $this->regex;
+        if ($this->getConfigKey('override_regexp_path') && $this->getConfigKey('override_regexp_class')) {
+            $path = $this->getConfigKey('override_regexp_path');
+            $className = $this->getConfigKey('override_regexp_class');
+
+            if (file_exists("{$path}/{$className}.class.php")) {
+                require_once "{$path}/{$className}.class.php";
+                $this->_regexp = new $className($this, $this->_config);
+            } else {
+                echo "COULD NOT FIND : {$path}/{$className}.class.php\n";
+            }
+        } else {
+            $this->_regexp = new miniRegexp($this);
+        }
+
+        return $this->_regexp;
     }
     
     public function getRenderer() {
@@ -101,7 +118,7 @@ class miniPPBuddy {
             require_once dirname(__FILE__) . '/render.class.php';
             $this->_renderer = new miniRender($this, $this->_config);
         }
-        
+
         return $this->_renderer;
         
     }

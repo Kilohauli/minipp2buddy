@@ -7,9 +7,9 @@
  */
 
 class miniRegexp {
-    private $buddy = false;
+    protected $buddy = false;
     
-    private $currentLine = 0;
+    protected $currentLine = 0;
     
     /**
      * Next constants use strpos() to match beginning of line
@@ -103,16 +103,16 @@ class miniRegexp {
     const SKIP_UNTILL_NEW_ROUND = 4;
     
     // File contents (There is not actual file to be uploaded, only a string
-    private $file = null;
+    protected $file = null;
     // File contents split to rows
-    private $rows = null;
+    protected $rows = null;
     
     /**
      * Set player with asterisk (*) as parsing player to identify "Omat kalat"
      * to know who to set the fishies to later on
      * @var string player name
      */
-    private $_parsingPlayer = null;
+    protected $_parsingPlayer = null;
     
     /**
      * 

@@ -46,7 +46,7 @@ abstract class miniProcessor {
     }
     
     /**
-     * Used to calculate the scores before output
+     * Used to calculate the scores before output # Could remove completely
      * @return array
      */
     abstract protected function calculate();
