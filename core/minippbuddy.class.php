@@ -27,7 +27,7 @@ class miniPPBuddy {
      * @var array player objects array per round
      */
     private $players = array();
-
+   
     /**
      * @var int Amount of rounds to be parsed, zero equals to infinite rounds
      */

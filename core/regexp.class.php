@@ -39,6 +39,16 @@ class miniRegexp {
     // Disqualified players (Failed to return to finish)
     const DISQUALIFIED = '/\(disq\)$/';
     
+    /**
+     * Disconnected players show up in the scores and fishes list
+     * These cause issues especially when player has returned and has same
+     * name as disconnected
+     * 
+     * Returns same array as PLAYER_INFORMATION
+     */
+    const DISCONNECTED = '/(\*\d+|\d+)\.\s{0,2}(\[.*\]\s{0,2}){0,1}(<\-\s.+)\s+0\s+g/';
+    
+    
     const RESULT = '/^(\*\d+|\d+)\.\s/';
     
     /** Lake information with resulting array keys
@@ -113,6 +123,15 @@ class miniRegexp {
      * @var string player name
      */
     protected $_parsingPlayer = null;
+    
+     /**
+     * Holds players with score line [num] <- name .* 0g
+     * without the (disq) at the end of line
+     * Need to be stored as these players are also found in the fishes
+     * section and require to be removed from there
+     * @var array
+     */
+    private $_disconnectedPlayers = array();
     
     /**
      * 
@@ -244,6 +263,46 @@ class miniRegexp {
         return false;
     }
     
+    public function isDisconnected($row) {
+        if (preg_match(self::DISCONNECTED, $row)) {
+            $name = $player[3];
+            $this->setDisconnectedPlayer(trim($name));
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Set disqualified player, no need for key as using array_search
+     * @param string $name
+     * @return boolean
+     */
+    public function setDisconnectedPlayer($name) {
+        $this->_disconnectedPlayers[] = $name;
+        return true;
+    }
+    
+    /**
+     * Search for disconnected player names (currently not in use as skipped
+     * the whole processing with continue; after isDisconnected = true
+     * @param string $name
+     * @return boolean
+     */
+    public function isDisconnectedPlayer($name) {
+        if (array_search($name, $this->_disconnectedPlayers) !== false) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Reset _disconnectedPlayers array for new round
+     */
+    public function clearDisconnectedPlayers() {
+        $this->_disconnectedPlayers = array();
+    }
+    
 /*    public function isDisqualified($row) { MOST LIKELY TO BE REMOVED
         if (preg_match(self::DISQUALIFIED, $row)) {
             return true;
@@ -291,25 +350,28 @@ class miniRegexp {
         $this->buddy->setRound(($this->buddy->getRound() - 1));
     }
     
+    public function inputToRows($input) {
+        return explode("\n", $input);
+    }
+    
     public function process() {
-        $this->rows = explode("\n", $this->file);
+        $this->rows = $this->inputToRows($this->file);
         $i = 0;
         $lake = null;
         $player = null;
         $rounds = $this->buddy->getRounds();
-
+        
         foreach ($this->rows as $r) {
             if (!mb_detect_encoding($r, "UTF-8", true)) {
                 $r = utf8_encode($r);
             }
-            
+
             $this->currentLine++;
             $r = trim($r);
             if ($this->isEmpty($r) || $this->isSkip($r) ||
                     $this->getStage() == self::SKIP_UNTILL_NEW_ROUND && !$this->isNewRound($r)) {
                 continue;
             }
-            
 
             switch (true) {
                 case $this->abandonRound($r):
@@ -326,11 +388,15 @@ class miniRegexp {
                     $lake->setRealTime($lakeInformation[5]);
                     $lake->setPoints($this->buddy->getPoints($this->buddy->getRound()));
                     $lake->setBiggestPoints($this->buddy->getBiggestPoints($this->buddy->getRound()));
+                    $this->setStage(self::IRRELEVANT);
                     break;
                 case $this->isFinished($r):
                     $this->setStage(self::RESULTS);
                     break;
                 case ($this->getStage() === self::RESULTS && $this->isResult($r)):
+                    if ($this->isDisconnected($r)) {
+                        continue;
+                    }
                     $plr = $this->getPlayerDetails($r);
                     if (!$player = $this->buddy->getPlayer($plr[3])) {
                         $player = $this->buddy->newPlayer($plr[3]);

@@ -24,11 +24,10 @@ $buddy->setBiggestPoints($biggestDummy);
 
 $exp = $buddy->getRegexp();
 
-print_r(get_class($exp));
-/*
 $buddy->setRounds(1);
-$f = file_get_contents('./score_demo2.txt');
+$f = file_get_contents('./score_demo.txt');
 $exp->setFile($f);
 
 $exp->process();
-print_r($buddy->finalScore());*/
+
+print_r($buddy->finalScore());
