@@ -9,6 +9,7 @@ class miniPlayer {
     protected $positions = array();
     protected $scores = array();
     protected $fishes = array();
+    protected $_wasDisconnected = false;
     
     private $_parsingPlayer = false;
     
@@ -83,6 +84,13 @@ class miniPlayer {
      * @param array $fish
      */
     public function setFishes($lake, $fish) {
+        if (isset($this->fishes[$lake]) && is_array($this->fishes[$lake])) {
+            foreach($this->fishes[$lake] as $key => $val) {
+                if ($val['fish'] == $fish[1]) {
+                    return;
+                }
+            }
+        }
         $this->fishes[$lake][] = array(
             'fish' => $fish[1],
             'amount' => $fish[2],
@@ -92,11 +100,18 @@ class miniPlayer {
     }
     
     public function getFishes($lake) {
+        if (!isset($this->fishes[$lake])) {
+            return false;
+        }
         return $this->fishes[$lake];
     }
     
     public function isParser() {
         return $this->_parsingPlayer;
+    }
+    
+    public function setDisconnected() {
+        $this->_wasDisconnected = true;
     }
     
     public function debug() {

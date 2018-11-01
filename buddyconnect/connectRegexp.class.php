@@ -27,4 +27,14 @@ class connectRegexp extends miniRegexp {
         $this->rows = $this->inputToRows($fileContents);
         $this->_playlog = new connectPlaylog($this->_rows, $this->buddy);
     }
+    
+    /**
+     * Identifies what pattern row is
+     * @param string $row
+     * @return string
+     */
+    public function rowType($row) {
+        
+        return $rowType;
+    }
 }

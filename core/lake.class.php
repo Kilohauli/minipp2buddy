@@ -14,7 +14,12 @@ class miniLake {
     private $round = 0;
     private $biggestFish = array();
     private $endScores = array();
-    private $disqualifiedPlayers = array(); // MOST LIKELY TOBE REMOVED
+    /**
+     * Store disconnected player objects as these players can be at scoring
+     * players
+     * @var array
+     */
+    private $disconnectedPlayers = array();
     
     /**
      * There is no actual round objects as lake does the same job, the scores
@@ -78,12 +83,32 @@ class miniLake {
         return $this->players;
     }
     
-/*    public function setDisqualifiedPlayer($name) {  MOST LIKELY TO BE REMOVED
-        if (!array_key_exists($this->buddy->strip($name), $this->disqualifiedPlayers)) {
-            $this->disqualifiedPlayers[$this->buddy->strip($name)] = true;
+    public function playerExists($name) {
+        $players = $this->getPlayers();
+        foreach ($players as $key => $player) {
+            if ($player->getName() === $name) {
+                return true;
+            }
         }
     }
-    */
+    
+    public function setDiconnectedPlayer($name, miniPlayer &$plrObj) {
+        if (!array_key_exists($this->buddy->strip($name), $this->disconnectedPlayers)) {
+            $this->setDiconnectedPlayer[$this->buddy->strip($name)] = $plrObj;
+        }
+    }
+    
+    public function getDisconnectedPlayer($name) {
+        $name = $this->buddy->strip($name);
+        if (array_key_exists($name, $this->disconnectedPlayers)) {
+            return true;
+        }
+        return false;
+    }
+    
+    public function hasDisconnectedPlayers() {
+        return empty($this->disconnectedPlayers) ? false : true;
+    }
     
     /**
      * Check if player did not finish. Currently used in end processing to check
@@ -119,16 +144,23 @@ class miniLake {
     public function process() {
         $out = array();
         foreach($this->points as $key => $point) {
-            if (!isset($this->players[$key])) {
+            $player = $this->players[$key];
+
+            if ($this->getDisconnectedPlayer($player->getName())) {
+                $player = $this->disconnectedPlayers($player->getName());
+            } else if (!isset($this->players[$key])) {
                 /* Quick kill switch if there is no more players in the 
                  * $this->players array */
                 break;
+            } else {
+                $player = $this->players[$key];
             }
-            if ($this->players[$key]->getScore($this->round) > 0) {
-                $this->endScores[$this->buddy->strip($this->players[$key]->getName())] = array(
-                    'name' => $this->players[$key]->getName(),
+            if ($player->getScore($this->round) > 0) {
+                $this->endScores[$this->buddy->strip($player->getName())] = array(
+                    'name' => $player->getName(),
                     'points' => (int) $point
                 );
+                
             }
 
         }

@@ -38,7 +38,7 @@ class miniFinnishLeague extends miniProcessor {
                 $plrObj = $this->_buddy->getPlayer($player['name']);
                 $plrTeam = $plrObj->getTeam();
                 $plrTeamStripped = $this->_buddy->strip($plrTeam);
-                
+
                 // To get biggest fish for the round
                 $this->iterateFishes($plrName, $plrTeam, $plrObj->getFishes($index));
                 
@@ -71,19 +71,8 @@ class miniFinnishLeague extends miniProcessor {
                 $this->addPlayerLakeResult($plrObj, $index);
                 $this->addPlayerFishes($plrObj, $index);
                 $this->playedLake($plrObj, $index);
+                $this->iterateFishes($plrObj->getName(), $plrObj->getTeam(), $plrObj->getFishes($index), $index);
             } 
-            /*foreach($zeroScoringPlayers as $key => $plrObj) {
-                echo "FOUND ZERO: " . $plrObj->getName() . " - ROUND: " . $index . "\n";
-                $playerStripped = $this->_buddy->strip($plrObj->getName());
-                if (in_array($playerStripped, $plrTemp[$index])) {
-                    echo "FOUND: " . $playerStripped . "\n";
-                    continue;
-                }
-                echo "ZERO: " . $plrObj->getName() . "\n";
-                $this->playerSkeleton($plrObj);
-                $this->addPlayerLakeResult($plrObj, $index);
-                $this->addPlayerFishes($plrObj, $index);
-            }*/
         }
         return $this->_teams;
     }
@@ -119,10 +108,9 @@ class miniFinnishLeague extends miniProcessor {
 
     public function output($format = 'array') {
         $this->calculate();
-        $lakeScore = array();
 
         $teamKeys = array_keys($this->_teams);
-        
+
         // Output array which collects all the data
         $temp = array();
         $finalScore = array(
@@ -143,9 +131,6 @@ class miniFinnishLeague extends miniProcessor {
             $finalScore[$teamKeys[1]] += (int) $temp['lakes'][$index]['league_score'][$teamKeys[1]];
             
             $temp['lakes'][$index] = array_merge($temp['lakes'][$index], $lake->getLakeDetail());
-            
-            $lakeScore[$teamKeys[0]];
-            $lakeScore[$teamKeys[1]];
         }
         $temp['final_score'] = $finalScore;
         $temp['team_names'] = array(
@@ -263,7 +248,7 @@ class miniFinnishLeague extends miniProcessor {
             $this->_countedPlayers[$name] = $team;
         }
         
-        return array_key_exists($name, $this->_teams[$team]['players']);
+        return array_key_exists($name, $this->_teams[$team]['players']) ? true : false;
     }
     
     /**

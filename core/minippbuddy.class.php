@@ -75,12 +75,9 @@ class miniPPBuddy {
     public function getConfigKey($name) {
         $vars = explode(".", $name);
         if (count($vars) > 1) {
-            $config = $this->_config[$vars[0]][$vars[1]];
+            $config = (isset($this->_config[$vars[0]][$vars[1]])) ? $this->_config[$vars[0]][$vars[1]] : false;
         } else {
-            $config = $this->_config[$vars[0]];
-        }
-        if (!$config) {
-            return false;
+            $config = (isset($this->_config[$vars[0]])) ? $this->_config[$vars[0]] : false;
         }
         return $config;
     }
@@ -176,6 +173,13 @@ class miniPPBuddy {
         return $this->lakes[$this->currentRound];
     }
     
+    public function getLake($index) {
+        if (isset($this->lakes[$index])) {
+            return $this->lakes[$index];
+        } else {
+            return false;
+        }
+    }
     /**
      * 
      * @param int $round
@@ -183,6 +187,14 @@ class miniPPBuddy {
      */
     public function removeLake($round) {
         $this->lakes[$round] = '';
+        reset($this->lakes);
+        $i = 1;
+        foreach($this->lakes as $key => $lake) {
+            $tmp[$i] = $lake;
+            $i++;
+        }
+        $this->lakes = $tmp;
+        unset($tmp);
         return true;
     }
     /**
@@ -367,7 +379,12 @@ class miniPPBuddy {
      * @return array
      */
     public function loadLanguageFile() {
-        $lang = $this->getConfigKey('language');
+        if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['transfile'])) {
+            $lang = $_SESSION['transfile'];
+        } else {
+            $lang = $this->getConfigKey('language');
+        }
+        
         $language_path = $this->getConfigKey('language_path');
         $this->_lang = require_once($language_path.$lang.".php");
         return $this->_lang;

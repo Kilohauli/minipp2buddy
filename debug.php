@@ -1,17 +1,17 @@
 <?php
-echo "<pre>";
+
+require_once('./core/minippbuddy.class.php');
 
 $config = require_once dirname(__FILE__) . '/config/config.php';
-
-require_once BUDDY_CORE_PATH.'/minippbuddy.class.php';
-
 $buddy = new miniPPBuddy($config);
 
+$request = $buddy->getRequest();
 /**
  * Mimic the parameters passed from the website for round scores
  */
-$scoresDummy = "14,12,10,9,8,7,6,5,4,3,2,1";
-$biggestDummy = "1";
+$scoresDummy = "12,10,8,7,6,5,4,3,2,1";
+$biggestDummy = "0";
+$teamPoints = "2,1,0";
 
 /**
  * Mimic the parameters passed from the websites for round scores as an array
@@ -21,13 +21,15 @@ $scoresBiggestArray = array();
 
 $buddy->setPoints($scoresDummy);
 $buddy->setBiggestPoints($biggestDummy);
-
 $exp = $buddy->getRegexp();
+$buddy->setRounds(3);
 
-$buddy->setRounds(1);
 $f = file_get_contents('./score_demo.txt');
 $exp->setFile($f);
-
+echo "<pre>";
 $exp->process();
 
-print_r($buddy->finalScore());
+$results = $request->process();
+echo "START REQUEST PROCESS\n";
+print_r($results);
+echo "REQUEST PROCESS FINISHED\n";

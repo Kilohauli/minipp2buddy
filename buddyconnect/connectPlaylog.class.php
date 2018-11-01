@@ -15,7 +15,11 @@ class connectPlaylog implements Iterator {
      */
     private $_buddy = false;
     
-    private $_config = array();
+    /**
+     *
+     * @var connectRegex
+     */
+    private $_regexp = false;
     
     private $_roundStart = 0;
     
@@ -24,6 +28,7 @@ class connectPlaylog implements Iterator {
     public function __construct(Array $playlog, miniPPBuddy &$buddy) {
         $this->_buddy = $buddy;
         $this->_rows = $playlog;
+        $this->_regexp = $this->_buddy->getRegexp();
     }
     
     public function rewind() {

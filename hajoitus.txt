@@ -1,0 +1,68 @@
+New LAN SERVER competition started: Taivallampi. (11.3. 9:20/ 30 min/ Medium / All species / Normal ice) [28.10.2018 12:13]
+
+New teamplay started [Reeniä] [28.10.2018 12:13:00]
+<-- Kilohauli [TKN] [FIN] left the game. [28.10.2018 12:16]
+--> Kilohauli [TKN] [FIN] joined the game (ip: 37.219.117.243). [28.10.2018 12:16] [/banaddress 37.219.117.243 60 Kilohauli_[TKN]_[FIN] 2036791723 db76aae400e3c8d48df378a0459ffb9427fd6de9]
+<-- Kilohauli [TKN] [FIN] left the game. [28.10.2018 12:17]
+--> Kilohauli [TKN] [FIN] joined the game (ip: 37.219.117.243). [28.10.2018 12:17] [/banaddress 37.219.117.243 60 Kilohauli_[TKN]_[FIN] 2036791723 db76aae400e3c8d48df378a0459ffb9427fd6de9]
+<-- Kilohauli [TKN] [FIN] left the game. [28.10.2018 12:21]
+--> Kilohauli [TKN] [FIN] joined the game (ip: 37.219.117.243). [28.10.2018 12:21] [/banaddress 37.219.117.243 60 Kilohauli_[TKN]_[FIN] 2036791723 db76aae400e3c8d48df378a0459ffb9427fd6de9]
+--> LeaTee [TKN] [FIN] joined the game (ip: 80.220.130.6). [28.10.2018 12:22] [/banaddress 80.220.130.6 60 LeaTee_[TKN]_[FIN] 2387779602 c0ea3b3afe189d5759d4e7a329ab9cf537cfd1ea]
+<-- Kilohauli [TKN] [FIN] left the game. [28.10.2018 12:23]
+--> Kilohauli [TKN] [FIN] joined the game (ip: 37.219.117.243). [28.10.2018 12:23] [/banaddress 37.219.117.243 60 Kilohauli_[TKN]_[FIN] 2036791723 db76aae400e3c8d48df378a0459ffb9427fd6de9]
+<-- Kilohauli [TKN] [FIN] left the game. [28.10.2018 12:24]
+--> Kilohauli [TKN] [FIN] joined the game (ip: 37.219.117.243). [28.10.2018 12:25] [/banaddress 37.219.117.243 60 Kilohauli_[TKN]_[FIN] 39176005 db76aae400e3c8d48df378a0459ffb9427fd6de9]
+<-- LeaTee [TKN] [FIN] left the game. [28.10.2018 12:26]
+--> LeaTee [TKN] [FIN] joined the game (ip: 80.220.130.6). [28.10.2018 12:26] [/banaddress 80.220.130.6 60 LeaTee_[TKN]_[FIN] 2387779602 c0ea3b3afe189d5759d4e7a329ab9cf537cfd1ea]
+Competition finished. Results:
+      *1. [TKN] -heikki- [FI]  4398 g 
+       2. [BOTTI] Anssi Ryhänen  3973 g 
+       3. [BOTTI] Ville Ikonen  3643 g 
+       4. [BOTTI] Mikko Happo  3252 g 
+       5. [BOTTI] Jukka Aalto  2487 g 
+       6. [BOTTI] Jussi Aarnio  2232 g 
+       7. [TKN] <- Kilohauli(2) [FIN]  396 g 
+       8. [TKN] Kilohauli [FIN]  333 g 
+       9. [TKN] <- Kilohauli(1) [FIN]  160 g 
+       10. [TKN] <- Kilohauli [FIN]  90 g 
+       11. [TKN] <- Kilohauli(3) [FIN]  0 g 
+       12. [TKN] LeaTee [FIN]  0 g (disq)
+       13. [TKN] <- LeaTee [FIN]  0 g (disq)
+     Omat kalat:
+     Ahven   Lukumäärä: 34   Yhteispaino: 4233   (Suurin: 474 g)
+     Kiiski   Lukumäärä: 2   Yhteispaino: 57   (Suurin: 31 g)
+     Särki   Lukumäärä: 3   Yhteispaino: 108   (Suurin: 44 g)
+     Anssi Ryhänen:
+     Ahven   Lukumäärä: 38   Yhteispaino: 2675   (Suurin: 216 g)
+     Kiiski   Lukumäärä: 2   Yhteispaino: 58   (Suurin: 29 g)
+     Särki   Lukumäärä: 21   Yhteispaino: 1240   (Suurin: 85 g)
+     Ville Ikonen:
+     Ahven   Lukumäärä: 50   Yhteispaino: 3255   (Suurin: 350 g)
+     Kiiski   Lukumäärä: 4   Yhteispaino: 134   (Suurin: 42 g)
+     Särki   Lukumäärä: 6   Yhteispaino: 254   (Suurin: 52 g)
+     Mikko Happo:
+     Ahven   Lukumäärä: 39   Yhteispaino: 2215   (Suurin: 148 g)
+     Kiiski   Lukumäärä: 5   Yhteispaino: 152   (Suurin: 38 g)
+     Hauki   Lukumäärä: 1   Yhteispaino: 510   (Suurin: 510 g)
+     Särki   Lukumäärä: 7   Yhteispaino: 375   (Suurin: 73 g)
+     Jukka Aalto:
+     Ahven   Lukumäärä: 38   Yhteispaino: 1831   (Suurin: 145 g)
+     Kiiski   Lukumäärä: 4   Yhteispaino: 137   (Suurin: 41 g)
+     Hauki   Lukumäärä: 1   Yhteispaino: 270   (Suurin: 270 g)
+     Särki   Lukumäärä: 4   Yhteispaino: 249   (Suurin: 76 g)
+     Jussi Aarnio:
+     Ahven   Lukumäärä: 29   Yhteispaino: 1584   (Suurin: 148 g)
+     Kiiski   Lukumäärä: 3   Yhteispaino: 89   (Suurin: 42 g)
+     Särki   Lukumäärä: 8   Yhteispaino: 559   (Suurin: 105 g)
+     <- Kilohauli(2):
+     Ahven   Lukumäärä: 3   Yhteispaino: 357   (Suurin: 180 g)
+     Särki   Lukumäärä: 1   Yhteispaino: 39   (Suurin: 39 g)
+     Kilohauli:
+     Ahven   Lukumäärä: 6   Yhteispaino: 302   (Suurin: 82 g)
+     Särki   Lukumäärä: 1   Yhteispaino: 31   (Suurin: 31 g)
+     <- Kilohauli(1):
+     Ahven   Lukumäärä: 2   Yhteispaino: 160   (Suurin: 116 g)
+     
+     <- Kilohauli(3):
+     Isoin kala:
+     Mikko Happo  Hauki  510 g

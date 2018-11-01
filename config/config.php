@@ -34,8 +34,8 @@ $config = array(
     // This is just for simplified installations
     'force_processor' => 'miniFinnishLeague',
     'force_controller' => 'ppIndexController',
-    'override_regexp_path' => BUDDY_ROOT_PATH . 'buddyconnect',
-    'override_regexp_class' => 'connectRegexp',
+    /*'override_regexp_path' => BUDDY_ROOT_PATH . 'buddyconnect',
+    'override_regexp_class' => 'connectRegexp',*/
     'language' => 'finnish',
     'db' => array( // Will add proper ORM (xPDO, Propel) have to see
         'name' => '',

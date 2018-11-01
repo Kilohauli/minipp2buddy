@@ -6,16 +6,25 @@ if (!class_exists('miniProcessor')) {
 
 class miniPlayerRanking extends miniProcessor {
     
-    protected function calculate() {
-        
+    protected function calculate() {}
+    
+    protected function breakDownLakes() {
+
     }
     
-    protected function output($format = 'array') {
-        
+    public function output($format = 'array') {
+        $out = array();
         if ($format === 'json') {
             $temp = json_encode($out);
         }
         
         return $out;
+    }
+    
+    /**
+     * Store values from miniPlayerRanking::output() to database
+     */
+    public function store() {
+        
     }
 }

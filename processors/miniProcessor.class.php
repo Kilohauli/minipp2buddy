@@ -57,34 +57,40 @@ abstract class miniProcessor {
      * @param string $format 
      * @return array|string
      */
-    abstract protected function output($format);
+    abstract public function output($format);
     
     /**
      * Compares current biggest fish (if set)
      * Used in iteration through all players and their fishes
      * @param array $details
      */
-    protected function biggestFish($details) {
-        if (empty($this->_rounds[$this->_currentRound]['biggest'])) {
-            $this->_rounds[$this->_currentRound]['biggest'] = $details;
+    protected function biggestFish($details, $round) {
+        if (empty($this->_rounds[$round]['biggest'])) {
+            $this->_rounds[$round]['biggest'] = $details;
             return true;
         }
         
         // Need to check the naming for biggest biggest :)
-        $weight = $this->_rounds[$this->_currentRound]['biggest']['weight'];
+        $weight = $this->_rounds[$round]['biggest']['weight'];
         if ($details['weight'] > $weight) {
-            $this->_rounds[$this->_currentRound]['biggest'] = $details;
+            $this->_rounds[$round]['biggest'] = $details;
         }
     }
     
-    protected function iterateFishes($player, $team, $fishes) {
+    protected function iterateFishes($player, $team, $fishes, $round = 0) {
+        if ($round === 0) {
+            $round = $this->_currentRound;
+        }
+        if (!is_array($fishes)) {
+            return;
+        }
         foreach($fishes as $i => $fish) {
             $this->biggestFish(array(
                 'name' => $player,
                 'team' => $team,
                 'weight' => $fish['biggest'],
                 'fish' => $fish['fish']
-            ));
+            ), $round);
             
         }
     }

@@ -46,7 +46,7 @@ class miniRegexp {
      * 
      * Returns same array as PLAYER_INFORMATION
      */
-    const DISCONNECTED = '/(\*\d+|\d+)\.\s{0,2}(\[.*\]\s{0,2}){0,1}(<\-\s.+)\s+0\s+g/';
+    const DISCONNECTED = '/(\*\d+|\d+)\.\s{0,2}(\[.*\]\s{0,2}){0,1}(<\-\s)(.+)\s+(\d+)\s+g/';
     
     
     const RESULT = '/^(\*\d+|\d+)\.\s/';
@@ -90,7 +90,7 @@ class miniRegexp {
      * 3 = Total weight
      * 4 = Biggest
      */
-    const FISHES_FOR_PLAYER = '/([a-zA-ZäöåÄÖÅ]*)\s+[a-zA-ZäöåÄÖÅ]+:\s+(\d+)\s+[a-zA-Z]+:\s+(\d+)\s+\([a-zA-Z]+:\s(\d+)\s+g\)/';
+    const FISHES_FOR_PLAYER = '/([a-zA-ZäöåÄÖÅ\.]*)\s+[a-zA-ZäöåÄÖÅ\.]+:\s+(\d+)\s+[a-zA-Z]+:\s+(\d+)\s+\([a-zA-Z]+:\s(\d+)\s+g\)/';
     
     /**
      * Biggest fish for the lake
@@ -99,7 +99,7 @@ class miniRegexp {
      * 2 = fish
      * 3 = weight
      */
-    const BIGGEST_FISH_FOR_LAKE = '/(.*)\s\s([a-zA-ZäöåÄÖÅ]*)\s+(\d+)\s+g/';
+    const BIGGEST_FISH_FOR_LAKE = '/(.*)\s\s([a-zA-ZäöåÄÖÅ\.]*)\s+(\d+)\s+g/';
     
     /*
      * Which part of round currently in process, easier to create clauses and predict what to do next
@@ -131,8 +131,14 @@ class miniRegexp {
      * section and require to be removed from there
      * @var array
      */
-    private $_disconnectedPlayers = array();
+    protected $_disconnectedPlayers = array();
     
+    /**
+     * Playlog might containt multiple new rounds without aborting string
+     * @var boolean
+     */
+    protected $_parsingResults = false;
+            
     /**
      * 
      * @param miniPPBuddy $buddy
@@ -196,6 +202,27 @@ class miniRegexp {
             $matches[] = null;
         }
         return $matches;
+    }
+    
+    public function getDisconnectedPlayerDetails($row) {
+        preg_match(self::DISCONNECTED, $row, $player);
+        preg_match(self::PLAYER_COUNTRY, $player[4], $country);
+        if (isset($country[1])) {
+            $player[] = $country[1];
+            $player[4] = trim(str_replace("[" . $country[1] . "]", '', $player[4]));
+        } else {
+            $matches[] = null;
+        }
+        unset($player[3]);
+        reset($player);
+        $i = 0;
+        $plrTmp = array();
+        foreach($player as $key => $val) {
+            $plrTmp[$i] = $val;
+            $i++;
+        }
+        $player = $plrTmp;
+        return $player;
     }
     
     public function getBiggest($row) {
@@ -265,8 +292,6 @@ class miniRegexp {
     
     public function isDisconnected($row) {
         if (preg_match(self::DISCONNECTED, $row)) {
-            $name = $player[3];
-            $this->setDisconnectedPlayer(trim($name));
             return true;
         }
         return false;
@@ -296,6 +321,12 @@ class miniRegexp {
         }
     }
     
+    public function isDisqualified($row) {
+        if (preg_match(self::DISQUALIFIED, $row)) {
+            return true;
+        }
+        return false;
+    }
     /**
      * Reset _disconnectedPlayers array for new round
      */
@@ -365,18 +396,23 @@ class miniRegexp {
             if (!mb_detect_encoding($r, "UTF-8", true)) {
                 $r = utf8_encode($r);
             }
-
             $this->currentLine++;
             $r = trim($r);
             if ($this->isEmpty($r) || $this->isSkip($r) ||
                     $this->getStage() == self::SKIP_UNTILL_NEW_ROUND && !$this->isNewRound($r)) {
                 continue;
             }
-
+            
             switch (true) {
                 case $this->abandonRound($r):
                     $this->setStage(self::SKIP_UNTILL_NEW_ROUND);
+                    $this->removeRound();
+                    $this->_parsingResults = false;
                     break;
+                case $this->_parsingResults == true && $this->isNewRound($r):
+                    $this->removeRound();
+                    $this->_parsingResults = false;
+                    // Continues straight to next case
                 case $this->isNewRound($r) && ($this->buddy->getRound() < $rounds || $rounds === 0):
                     $lakeInformation = $this->getLake($r);
                     $lake = $this->buddy->newLake();
@@ -389,19 +425,39 @@ class miniRegexp {
                     $lake->setPoints($this->buddy->getPoints($this->buddy->getRound()));
                     $lake->setBiggestPoints($this->buddy->getBiggestPoints($this->buddy->getRound()));
                     $this->setStage(self::IRRELEVANT);
+                    $this->_parsingResults = true;
                     break;
                 case $this->isFinished($r):
                     $this->setStage(self::RESULTS);
                     break;
+                case ($this->getStage() === self::RESULTS && $this->isDisqualified($r)):
+                    continue;
                 case ($this->getStage() === self::RESULTS && $this->isResult($r)):
                     if ($this->isDisconnected($r)) {
-                        continue;
-                    }
-                    $plr = $this->getPlayerDetails($r);
-                    if (!$player = $this->buddy->getPlayer($plr[3])) {
-                        $player = $this->buddy->newPlayer($plr[3]);
+                        $plr = $this->getDisconnectedPlayerDetails($r);
+                        if ($lake->playerExists($plr[3])) {
+                            continue;
+                        }
+                        if (!$player = $this->buddy->getPlayer($plr[3])) {
+                            $player = $this->buddy->newPlayer($plr[3]);
+                        }
+                        $lake->setDiconnectedPlayer($plr[3], $player);
+                        $disconnected = true;
+                    } else {
+                        $plr = $this->getPlayerDetails($r);
+                        if ($lake->playerExists($plr[3])) {
+                            continue;
+                        }
+                        if (!$player = $this->buddy->getPlayer($plr[3])) {
+                            $player = $this->buddy->newPlayer($plr[3]);
+                        }
+                        $disconnected = false;
                     }
                     $lake->setPlayer($player);
+                    if ($disconnected === true) {
+                        $player->setDisconnected();
+                    }
+                    
                     $player->setPosition($this->buddy->getRound(), $plr[1]);
                     $player->setTeam($plr[2]);
                     $player->setName($plr[3]);
@@ -409,7 +465,7 @@ class miniRegexp {
                     $player->setCountry($plr[5]);
                     if ($player->isParser()) {
                         $this->_parsingPlayer = $player->getName();
-                    }
+                    }                    
                     break;
                 case ($this->isOwnFish($r)) :
                     $this->setStage(self::FISHES);
@@ -428,6 +484,7 @@ class miniRegexp {
                     }
                     $fishDetails = $this->fishForPlayer($r);
                     $player->setFishes($this->buddy->getRound(), $fishDetails);
+                    
                     break;
                 case ($this->getStage() === self::FISHES && $this->isBiggestFish($r)) :
                     $this->setStage(self::BIGGEST);
@@ -436,6 +493,7 @@ class miniRegexp {
                     $biggest = $this->getBiggest($r);
                     $lake->setBiggestFish($biggest);
                     $this->setStage(self::IRRELEVANT);
+                    $this->_parsingResults = false;
                     if ($this->buddy->getRound() == $rounds) { // Fix issue for loop going too far to next rounds individual fishies
                         break 2;
                     }
