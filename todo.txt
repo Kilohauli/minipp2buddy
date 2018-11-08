@@ -6,6 +6,9 @@ UI
 
 Core
 - Rename all files and classes to match same patterns (camelCase etc...)
+    - PSR might be an excellent idea
 - Loads of logging and error detection
 - Fix biggest fish to be checked from player fishes instead of using the
     "Isoin kala:" due 'Most species' game type does not have anything in it
+- Remove Controllers, utterly and completely useless part at this point
+    - Or replace with slim
