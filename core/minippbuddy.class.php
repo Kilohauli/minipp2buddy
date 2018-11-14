@@ -96,10 +96,9 @@ class miniPPBuddy {
         if ($this->getConfigKey('override_regexp_path') && $this->getConfigKey('override_regexp_class')) {
             $path = $this->getConfigKey('override_regexp_path');
             $className = $this->getConfigKey('override_regexp_class');
-
             if (file_exists("{$path}/{$className}.class.php")) {
                 require_once "{$path}/{$className}.class.php";
-                $this->_regexp = new $className($this, $this->_config);
+                $this->_regexp = new $className($this);
             } else {
                 echo "COULD NOT FIND : {$path}/{$className}.class.php\n";
             }

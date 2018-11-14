@@ -29,7 +29,7 @@ class connectRegexp extends miniRegexp {
      */
     const BIGGEST_FISH_MATCH = 102;
     
-    public function __construct(\miniPPBuddy &$buddy) {
+    public function __construct(miniPPBuddy &$buddy) {
         parent::__construct($buddy);
         $this->loadIterable();
     }
@@ -41,8 +41,13 @@ class connectRegexp extends miniRegexp {
     }
     
     public function setFile($fileContents) {
-        $this->rows = $this->inputToRows($fileContents);
-        $this->_playlog = new connectPlaylog($this->_rows, $this->buddy);
+        if ($this->file === null) {
+            $this->file = $fileContents;
+            $this->currentLine = 0;
+            $this->rows = $this->inputToRows($fileContents);
+            $this->_playlog = new connectPlaylog($this->rows, $this->buddy);
+        }
+        return true;
     }
     
     

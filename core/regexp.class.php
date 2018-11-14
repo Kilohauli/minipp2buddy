@@ -156,6 +156,7 @@ class miniRegexp {
         if ($this->file === null) {
             $this->file = $fileContents;
             $this->currentLine = 0;
+            $this->rows = $this->inputToRows($this->file);
         }
 
         return true;
@@ -208,6 +209,12 @@ class miniRegexp {
         return $matches;
     }
     
+    /**
+     * Check if pattern matches disconnected players.
+     * This requires <- arrow before name and no (disq) after name
+     * @param string $row
+     * @return array
+     */
     public function getDisconnectedPlayerDetails($row) {
         preg_match(self::DISCONNECTED, $row, $player);
         preg_match(self::PLAYER_COUNTRY, $player[4], $country);
@@ -392,7 +399,6 @@ class miniRegexp {
     }
     
     public function process() {
-        $this->rows = $this->inputToRows($this->file);
         $i = 0;
         $lake = null;
         $player = null;

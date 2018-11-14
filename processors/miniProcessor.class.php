@@ -2,6 +2,24 @@
 
 abstract class miniProcessor {
     /**
+     * Holds player scores, fishes and so on
+     * @var array
+     */
+    protected $_players = array();
+    /**
+     * Holds players with points, easier for differentiating zero score 
+     * players at the end
+     * @var array
+     */
+    protected $_countedPlayers = array();
+    
+    /*
+     * Team scores, players with scores and other details
+     * $var array
+     */
+    protected $_teams = array();
+    
+    /**
      *
      * @var miniPPBuddy
      */
