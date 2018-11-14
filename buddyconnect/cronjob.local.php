@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Cronjob to that can be run on host that has php-cli installed
  */
@@ -26,11 +25,9 @@ $scoresBiggestArray = array();
 $buddy->setPoints($scoresDummy);
 $buddy->setBiggestPoints($biggestDummy);
 $exp = $buddy->getRegexp();
+$f = $exp->tail($buddy->getConfigKey('playlog_path'), 500);
+
 $buddy->setRounds(3);
-
-$f = file_get_contents(BUDDY_ROOT_PATH . 'score_demo.txt');
 $exp->setFile($f);
-
 $exp->process();
-
 print_r($request->process());

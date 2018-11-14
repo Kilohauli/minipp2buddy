@@ -41,6 +41,9 @@ class connectRegexp extends miniRegexp {
     }
     
     public function setFile($fileContents) {
+        if (!mb_detect_encoding($fileContents, "UTF-8", true)) {
+            $fileContents = utf8_encode($fileContents);
+        }
         if ($this->file === null) {
             $this->file = $fileContents;
             $this->currentLine = 0;
@@ -52,12 +55,38 @@ class connectRegexp extends miniRegexp {
     
     
     public function getReverseRows() {
-        $this->_playlogReverse = $this->_playlog->copyToReverse();
+        return $this->_playlog->copyToReverse();
     }
 
-    public function iterate() {
-        
+    public function process() {
+        $reverse = $this->getReverseRows();
+        $rows = $reverse->getRows();
+        $rndStarts = null;
+        $rndEnds = null;
+        foreach ($rows as $i => $row) {
+            $rowType = $this->rowType($row);
+            if ($rowType === self::BIGGEST_FISH_MATCH) {
+                $rndEnds = $i;
+                // Jump over next row that would contain "Isoin kala:"
+                continue 2;
+                //parent::process();
+                break;
+            } else if ($rowType === self::NEW_ROUND_MATCH) {
+                if ($rndEnds !== null) {
+                    $rndStarts = $i;
+                }
+                break;
+            }
+        }
+        if ($rndStarts !== null && $rndEnds !== null) {
+            $this->rows = array_reverse(array_slice($rows, $rndEnds, $rndStarts));
+        } else if ($rndStart === null && $rndEnds !== null) {
+            // Longer partition from playlog required. Round start not found
+        } else if ($rndStart !== null && $rndEnds === null) {
+            // Incomplete round
+        }
     }
+    
     /**
      * Identifies what pattern row is
      * Constants do not match exactly what is wanted but 
@@ -67,15 +96,65 @@ class connectRegexp extends miniRegexp {
     public function rowType($row) {
         switch (true) {
             case $this->isNewRound($row):
-                $rowType = self::NEW_ROUND_MATCH;
+                // 
+                return self::NEW_ROUND_MATCH;
                 break;
+            case $this->isBiggestFishPlayer($row) :
             case $this->isBiggestFish($row):
-                $rowType = self::BIGGEST_FISH_MATCH;
+                return self::BIGGEST_FISH_MATCH;
                 break;
             default : // All the other rows just skip
                 $rowType = false;
                 break;
         }
         return $rowType;
+    }
+    
+    protected function isBiggestFishPlayer($row) {
+        if (preg_match(self::BIGGEST_FISH_FOR_LAKE, $row)) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Reset rows to match start and end of round
+     * @param integer $start
+     * @param integer $end
+     */
+    protected function resetRows($start, $end) {
+        
+    }
+    /**
+     * Slightly modified version of http://www.geekality.net/2011/05/28/php-tail-tackling-large-files/
+     * @author Torleif Berger, Lorenzo Stanco
+     * @link http://stackoverflow.com/a/15025877/995958
+     * @license http://creativecommons.org/licenses/by/3.0/
+     * @link https://gist.github.com/lorenzos/1711e81a9162320fde20 original 
+     */
+    public function tail($filepath, $lines = 1, $adaptive = true) {
+           $f = @fopen($filepath, "rb");
+           if ($f === false) return false;
+           if (!$adaptive) $buffer = 4096;
+           else $buffer = ($lines < 2 ? 64 : ($lines < 10 ? 512 : 4096));
+           fseek($f, -1, SEEK_END);
+           if (fread($f, 1) != "\n") $lines -= 1;
+           
+           $output = '';
+           $chunk = '';
+
+           while (ftell($f) > 0 && $lines >= 0) {
+                   $seek = min(ftell($f), $buffer);
+                   fseek($f, -$seek, SEEK_CUR);
+                   $output = ($chunk = fread($f, $seek)) . $output;
+                   fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
+                   $lines -= substr_count($chunk, "\n");
+           }
+
+           while ($lines++ < 0) {
+                   $output = substr($output, strpos($output, "\n") + 1);
+           }
+           fclose($f);
+           return trim($output);
     }
 }
