@@ -30,7 +30,7 @@ $buddy->setRounds(3);
 
 $f = file_get_contents(BUDDY_ROOT_PATH . 'score_demo.txt');
 $exp->setFile($f);
-
-$exp->process();
 echo "<pre>";
+$exp->process();
+
 print_r($request->process());

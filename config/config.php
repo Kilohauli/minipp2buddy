@@ -45,7 +45,8 @@ $config = array(
     /* Absolute path to playlog when running cronjob. Commonly in:
      * /etc/pp2host/static/playlog.txt
      */
-    'playlog_path' => '/home/timo/pp2host/playlog.txt'
+    'playlog_path' => '/home/timo/pp2host/playlog.txt',
+    'use_biggest_fish' => false
 );
 
 return $config;

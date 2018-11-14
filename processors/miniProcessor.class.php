@@ -114,14 +114,16 @@ abstract class miniProcessor {
      * @return array
      */
     protected function getBiggestFishes() {
-        foreach($this->_rounds as $key => $round) {
-            $biggest[$key] = array_merge($round['biggest'], array(
-                'team_strip' => $this->_buddy->strip($round['biggest']['team']),
-                'name_strip' => $this->_buddy->strip($round['biggest']['name'])
-                )
-            );
+        if (!$this->_buddy->getConfigKey('use_biggest_fish')) {
+            foreach($this->_rounds as $key => $round) {
+                $biggest[$key] = array_merge($round['biggest'], array(
+                    'team_strip' => $this->_buddy->strip($round['biggest']['team']),
+                    'name_strip' => $this->_buddy->strip($round['biggest']['name'])
+                    )
+                );
+            }
         }
-        
+
         return $biggest;
     }
     

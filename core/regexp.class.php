@@ -410,7 +410,7 @@ class miniRegexp {
             }
             $this->currentLine++;
             $r = trim($r);
-            if ($this->isEmpty($r) || $this->isSkip($r) ||
+            if (($this->isEmpty($r) && $this->getStage() !== self::BIGGEST) || $this->isSkip($r) ||
                     $this->getStage() == self::SKIP_UNTILL_NEW_ROUND && !$this->isNewRound($r)) {
                 continue;
             }
