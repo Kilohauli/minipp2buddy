@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Cronjob to that can be run on host that has php-cli installed
+ * Cronjob for debugging in browser as no scrollback restrictions/settings
  */
 
 $config = require_once dirname(dirname(__FILE__)) . '/config/config.php';
@@ -32,5 +32,5 @@ $f = file_get_contents(BUDDY_ROOT_PATH . 'score_demo.txt');
 $exp->setFile($f);
 
 $exp->process();
-
+echo "<pre>";
 print_r($request->process());

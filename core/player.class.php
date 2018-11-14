@@ -48,6 +48,11 @@ class miniPlayer {
         $this->country = $country;
     }
     
+    public function getCountry() {
+        return $this->country;
+    }
+    
+    
     /*** NEXT ONES MIGHT CHANGE ***/
     
     /**
