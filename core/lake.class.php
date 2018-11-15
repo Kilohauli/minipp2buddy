@@ -129,14 +129,19 @@ class miniLake {
      * @param array $biggest
      */
     public function setBiggestFish($biggest) {
-        $this->biggestFish = array(
-            'key' => $this->buddy->strip($biggest[1]),
-            'name' => $biggest[1],
-            'fish' => $biggest[2],
-            'weight' => $biggest[3]
-        );
+        if (!empty($biggest[1])) {
+            $this->biggestFish = array(
+                'key' => $this->buddy->strip($biggest[1]),
+                'name' => $biggest[1],
+                'fish' => $biggest[2],
+                'weight' => $biggest[3]
+            );
+        }
     }
     
+    public function getBiggestFish() {
+        return $this->biggestFish;
+    }
     /**
      * Processes the final results for lake
      * @return array

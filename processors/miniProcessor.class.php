@@ -2,6 +2,19 @@
 
 abstract class miniProcessor {
     /**
+     * Holds players with points, easier for differentiating zero score 
+     * players at the end
+     * @var array
+     */
+    protected $_countedPlayers = array();
+    
+    /*
+     * Team scores, players with scores and other details
+     * $var array
+     */
+    protected $_teams = array();
+    
+    /**
      *
      * @var miniPPBuddy
      */
@@ -17,13 +30,13 @@ abstract class miniProcessor {
      * Lakes
      * @var array|miniLake
      */
-    protected $_lakes = null;
+    protected $_lakes = array();
     
     /**
      * Players
      * @var array
      */
-    protected $_players = null;
+    protected $_players = array();
     
     /**
      * Rounds
@@ -77,21 +90,55 @@ abstract class miniProcessor {
         }
     }
     
-    protected function iterateFishes($player, $team, $fishes, $round = 0) {
-        if ($round === 0) {
-            $round = $this->_currentRound;
+    protected function iterateFishes($player, $team, $fishes, $rnd = false) {
+        if (!$rnd) {
+            $rnd = $this->_currentRound;
         }
         if (!is_array($fishes)) {
             return;
         }
-        foreach($fishes as $i => $fish) {
-            $this->biggestFish(array(
-                'name' => $player,
-                'team' => $team,
-                'weight' => $fish['biggest'],
-                'fish' => $fish['fish']
-            ), $round);
-            
+        if (!$this->_buddy->getConfigKey('use_biggest_fish')) {
+            foreach($fishes as $i => $fish) {
+                $this->biggestFish(array(
+                    'name' => $player,
+                    'team' => $team,
+                    'weight' => $fish['biggest'],
+                    'fish' => $fish['fish'],
+                    'points' => $this->_buddy->getBiggestPoints($rnd)[0]
+                ), $rnd);
+            }
+        } else {
+            if (empty($this->_rounds[$rnd]['biggest'])) {
+                $biggest = $this->_lakes[$rnd]->getBiggestFish();
+                if (!empty($biggest)) {
+                    $plrObj = $this->_buddy->getPlayer($biggest['name']);
+                    $this->biggestFish(array(
+                        'name' => $plrObj->getName(),
+                        'team' => $plrObj->getTeam(),
+                        'weight' => $biggest['weight'],
+                        'fish' => $biggest['fish'],
+                        'points' => $this->_buddy->getBiggestPoints($rnd)[0]
+                    ), $rnd);
+                } else {
+                    $this->_rounds[$rnd]['biggest']['name'] = '';
+                }
+            }
+            if (empty($this->_rounds[$rnd]['biggest']['name'])) {
+                /* If empty for biggest fish, iterate player fishes 
+                 * for this round
+                 * Usually caused by "Most species" competition type which 
+                 * has nothing in it
+                */
+                foreach($fishes as $i => $fish) {
+                    $this->biggestFish(array(
+                        'name' => $player,
+                        'team' => $team,
+                        'weight' => $fish['biggest'],
+                        'fish' => $fish['fish'],
+                        'points' => $this->_buddy->getBiggestPoints($rnd)[0]
+                    ), $rnd);
+                }
+            }
         }
     }
     
@@ -109,6 +156,18 @@ abstract class miniProcessor {
         }
         
         return $biggest;
+    }
+    
+    /**
+     * 
+     * @param miniPlayer $players
+     * @param array $biggest
+     */
+    protected function addPlayerBiggestPoints($biggest) {
+        foreach ($biggest as $rnd => $fish) {
+            $this->_players[$fish['name_strip']]['biggest_points'][$rnd] = $fish['points'];
+            $this->_players[$fish['name_strip']]['total'] += $fish['points'];
+        }
     }
     
     protected function sortPlayers($sortA, $sortB) {

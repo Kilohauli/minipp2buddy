@@ -12,3 +12,5 @@ Core
     "Isoin kala:" due 'Most species' game type does not have anything in it
 - Remove Controllers, utterly and completely useless part at this point
     - Or replace with slim
+- Refactor processors as there is quite lot of pretty similar methods
+    - Move under miniProcessor preferrably

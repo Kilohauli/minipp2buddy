@@ -4,21 +4,8 @@ if (!class_exists('miniProcessor')) {
     require_once dirname(__FILE__) . '/miniProcessor.class.php';
 }
 
-class miniFinnishLeague extends miniProcessor {
-    
-    /*
-     * Team scores, players with scores and other details
-     * $var array
-     */
-    protected $_teams = array();
-    
-    /**
-     * Holds players with points, easier for differentiating zero score 
-     * players at the end
-     * @var array
-     */
-    protected $_countedPlayers = array();
-    
+class miniFinnishLeague extends miniProcessor {    
+   
     public function __construct(\miniPPBuddy &$buddy) {
         parent::__construct($buddy);
     }

@@ -97,10 +97,17 @@ class connectPlaylog implements Iterator {
     }
     
     /**
+     * Get rows array
+     * @return array
+     */
+    public function getRows() {
+        return $this->_rows;
+    }
+    /**
      * New connectPlaylog in reverse row order
      * @return \connectPlaylog
      */
     public function copyToReverse() {
-        return new connectPlaylog(array_flip($this->_rows), $this->_buddy);
+        return new connectPlaylog(array_reverse($this->_rows), $this->_buddy);
     }
 }
