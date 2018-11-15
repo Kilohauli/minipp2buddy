@@ -21,13 +21,17 @@ $teamPoints = "2,1,0";
  */
 $scoresDummyArray = array();
 $scoresBiggestArray = array();
-
 $buddy->setPoints($scoresDummy);
 $buddy->setBiggestPoints($biggestDummy);
 $exp = $buddy->getRegexp();
-$f = $exp->tail($buddy->getConfigKey('playlog_path'), 500);
+if (!empty($buddy->getConfigKey('playlog_path_debug'))) {
+    $playlog = $exp->tail($buddy->getConfigKey('playlog_path_debug'), 500);
+} else {
+    $playlog = $exp->tail($buddy->getConfigKey('playlog_path'), 500);
+}
 
-$buddy->setRounds(3);
-$exp->setFile($f);
+$buddy->setRounds($buddy->getConfigKey('max_rounds'));
+$exp->setFile($playlog);
 $exp->process();
+die();
 print_r($request->process());

@@ -28,6 +28,11 @@ class connectRegexp extends miniRegexp {
      * Biggest fish was found
      */
     const BIGGEST_FISH_MATCH = 102;
+
+    /**
+     * Biggest fish with player name was found
+     */
+    const BIGGEST_FISH_PLAYER_MATCH = 103;
     
     public function __construct(miniPPBuddy &$buddy) {
         parent::__construct($buddy);
@@ -61,29 +66,30 @@ class connectRegexp extends miniRegexp {
     public function process() {
         $reverse = $this->getReverseRows();
         $rows = $reverse->getRows();
+
         $rndStarts = null;
         $rndEnds = null;
+        $biggestFishMatch = false;
         foreach ($rows as $i => $row) {
+            $row = trim($row);
             $rowType = $this->rowType($row);
-            if ($rowType === self::BIGGEST_FISH_MATCH) {
+            if ($rowType === self::BIGGEST_FISH_PLAYER_MATCH) {
+                $biggestFishMatch = true;
                 $rndEnds = $i;
-                // Jump over next row that would contain "Isoin kala:"
-                continue 2;
-                //parent::process();
-                break;
+            } else if ($rowType === self::BIGGEST_FISH_MATCH && !$biggestFishMatch) {
+                $rndEnds = $i;
             } else if ($rowType === self::NEW_ROUND_MATCH) {
-                if ($rndEnds !== null) {
-                    $rndStarts = $i;
-                }
-                break;
+                $rndStarts = $i;
             }
         }
         if ($rndStarts !== null && $rndEnds !== null) {
-            $this->rows = array_reverse(array_slice($rows, $rndEnds, $rndStarts));
-        } else if ($rndStart === null && $rndEnds !== null) {
+            $this->rows = array_reverse($this->resetRows($rows, $rndStarts, $rndEnds));
+        } else if ($rndStarts === null && $rndEnds !== null) {
             // Longer partition from playlog required. Round start not found
-        } else if ($rndStart !== null && $rndEnds === null) {
+            echo "PARTIAL ROUND, MORE PLAYLOG REQUIRED\n";
+        } else if ($rndStarts !== null && $rndEnds === null) {
             // Incomplete round
+            echo "ROUND STARTED ONLY\n";
         }
     }
     
@@ -100,6 +106,7 @@ class connectRegexp extends miniRegexp {
                 return self::NEW_ROUND_MATCH;
                 break;
             case $this->isBiggestFishPlayer($row) :
+                return self::BIGGEST_FISH_PLAYER_MATCH;
             case $this->isBiggestFish($row):
                 return self::BIGGEST_FISH_MATCH;
                 break;
@@ -122,9 +129,10 @@ class connectRegexp extends miniRegexp {
      * @param integer $start
      * @param integer $end
      */
-    protected function resetRows($start, $end) {
-        
+    protected function resetRows($rows, $start, $end) {
+        return array_slice($rows, $end, $start);
     }
+    
     /**
      * Slightly modified version of http://www.geekality.net/2011/05/28/php-tail-tackling-large-files/
      * @author Torleif Berger, Lorenzo Stanco
