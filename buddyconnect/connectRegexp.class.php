@@ -34,6 +34,23 @@ class connectRegexp extends miniRegexp {
      */
     const BIGGEST_FISH_PLAYER_MATCH = 103;
     
+    // Constants for actions returned by self::sendDetails()
+    
+    /**
+     * Incomplete round, waiting for next send
+     */
+    const ACTION_INCOMPLETE = 201;
+    
+    /**
+     * Complete round, waiting for next round
+     */
+    const ACTION_COMPLETE = 202;
+    
+    /**
+     * Partial round, more data required from script
+     */
+    const ACTION_PARTIAL = 203;
+    
     public function __construct(miniPPBuddy &$buddy) {
         parent::__construct($buddy);
         $this->loadIterable();
@@ -84,13 +101,25 @@ class connectRegexp extends miniRegexp {
         }
         if ($rndStarts !== null && $rndEnds !== null) {
             $this->rows = array_reverse($this->resetRows($rows, $rndStarts, $rndEnds));
+            parent::process();
+            $out = array(
+                'action' => self::ACTION_COMPLETE
+            );
         } else if ($rndStarts === null && $rndEnds !== null) {
             // Longer partition from playlog required. Round start not found
-            echo "PARTIAL ROUND, MORE PLAYLOG REQUIRED\n";
+            $out = array(
+                'action' => self::ACTION_PARTIAL,
+                'start' => null,
+                'end' => $rndEnds
+            );
         } else if ($rndStarts !== null && $rndEnds === null) {
-            // Incomplete round
-            echo "ROUND STARTED ONLY\n";
+            $out = array(
+                'action' => self::ACTION_INCOMPLETE,
+                'start' => $rndStarts,
+                'end' => null
+            );
         }
+        return $out;
     }
     
     /**
