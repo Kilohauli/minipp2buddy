@@ -149,14 +149,13 @@ class miniLake {
     public function process() {
         $out = array();
         foreach($this->points as $key => $point) {
+            if (!isset($this->players[$key])) {
+                break;
+            }
             $player = $this->players[$key];
-
+            
             if ($this->getDisconnectedPlayer($player->getName())) {
                 $player = $this->disconnectedPlayers($player->getName());
-            } else if (!isset($this->players[$key])) {
-                /* Quick kill switch if there is no more players in the 
-                 * $this->players array */
-                break;
             } else {
                 $player = $this->players[$key];
             }
@@ -172,7 +171,7 @@ class miniLake {
         // bubblegum fix to biggest fish missing in 'Most species' for now
         if (!empty($this->biggestFish)) {
             if (array_key_exists($this->biggestFish['key'], $this->endScores)) {
-            $this->endScores[$this->biggestFish['key']]['points'] += (int) $this->pointsFish;
+                $this->endScores[$this->biggestFish['key']]['points'] += (int) $this->pointsFish;
             } else {
                 $this->endScores[$this->biggestFish['key']] = array(
                     'name' => $this->biggestFish['name'],

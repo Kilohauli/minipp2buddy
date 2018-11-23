@@ -139,8 +139,8 @@ class miniPPBuddy {
     public function strip($string) {
         return (string) strtolower(
             str_replace(
-                    array("[", "]", 'ä', 'ö', 'å', 'Ä', 'Ö', 'Å', ' ', '(', ')', '-', '*', ','), 
-                    array('', '', 'a', 'o', 'a', 'A', 'O', 'A', '', '', '', '_', '', ''), 
+                    array("[", "]", 'ä', 'ö', 'å', 'Ä', 'Ö', 'Å', ' ', '(', ')', '-', '*', ',', '@'), 
+                    array('', '', 'a', 'o', 'a', 'A', 'O', 'A', '', '', '', '_', '', '', 'a'), 
                         $string));
     }
     
@@ -435,7 +435,7 @@ class miniPPBuddy {
                 $str = $this->translate('evening');
                 break;
             case '18' :
-                $str = $this->translate('night') . " " . $date[0];
+                $str = $this->translate('night') . " " . $time[0];
                 break;
         }
         return $str;
