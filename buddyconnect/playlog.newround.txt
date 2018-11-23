@@ -1,0 +1,7 @@
+New LAN CLIENT competition started: Savilahti. (13.11. 12:10/ 30 min/ Medium / All species / Normal ice) [28.10.2018 20:00]
+--> Juku6.1 (A) [SK] [FIN] joined the game (ip: 164.5.194.18). [19.10.2018 14:58] [/banaddress 164.5.194.18 60 Juku6.1_(A)_[SK]_[FIN] 586784114 0286f03f4d617e08afda29f08b2ecd8bdcc95d62]
+--> Kirjuri joined the game (ip: 10.0.0.35). [19.10.2018 14:59] [/banaddress 10.0.0.35 60 Kirjuri 1284437777 ]
+--> simo pulkkinen joined the game (ip: 109.240.39.187). [19.10.2018 15:04] [/banaddress 109.240.39.187 60 simo_pulkkinen 2315486606 ]
+--> Pirkko [SK] [FIN] joined the game (ip: 46.254.209.217). [19.10.2018 15:05] [/banaddress 46.254.209.217 60 Pirkko_[SK]_[FIN] 2873362 ]
+--> metsuri [FI] joined the game (ip: 85.76.18.178). [19.10.2018 15:07] [/banaddress 85.76.18.178 60 metsuri_[FI] 280155762 edc1238f75ec88b7408f12440fffbaf21707dea5]
+<-- simo pulkkinen left the game. [19.10.2018 15:07]

@@ -166,7 +166,7 @@ abstract class miniProcessor {
     protected function addPlayerBiggestPoints($biggest) {
         foreach ($biggest as $rnd => $fish) {
             $this->_players[$fish['name_strip']]['biggest_points'][$rnd] = $fish['points'];
-            $this->_players[$fish['name_strip']]['total'] += $fish['points'];
+            //$this->_players[$fish['name_strip']]['total'] = $fish['points'];
         }
     }
     

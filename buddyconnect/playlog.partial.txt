@@ -1,0 +1,51 @@
+     Kiiski   Lukumäärä: 6   Yhteispaino: 147   (Suurin: 34 g)
+     Särki   Lukumäärä: 6   Yhteispaino: 299   (Suurin: 152 g)
+     Lahna   Lukumäärä: 2   Yhteispaino: 580   (Suurin: 327 g)
+     Pasuri   Lukumäärä: 6   Yhteispaino: 819   (Suurin: 148 g)
+     Salakka   Lukumäärä: 1   Yhteispaino: 25   (Suurin: 25 g)
+     Mr saxobeat:
+     Ahven   Lukumäärä: 5   Yhteispaino: 375   (Suurin: 117 g)
+     Kiiski   Lukumäärä: 7   Yhteispaino: 115   (Suurin: 37 g)
+     Särki   Lukumäärä: 2   Yhteispaino: 225   (Suurin: 145 g)
+     Lahna   Lukumäärä: 4   Yhteispaino: 1699   (Suurin: 515 g)
+     Puolesta:
+     Ahven   Lukumäärä: 6   Yhteispaino: 153   (Suurin: 77 g)
+     Kiiski   Lukumäärä: 2   Yhteispaino: 38   (Suurin: 26 g)
+     Siika   Lukumäärä: 4   Yhteispaino: 1338   (Suurin: 468 g)
+     Särki   Lukumäärä: 1   Yhteispaino: 10   (Suurin: 10 g)
+     Lahna   Lukumäärä: 2   Yhteispaino: 714   (Suurin: 406 g)
+     Sorva   Lukumäärä: 1   Yhteispaino: 104   (Suurin: 104 g)
+     Juze:
+     Ahven   Lukumäärä: 15   Yhteispaino: 1327   (Suurin: 152 g)
+     Kiiski   Lukumäärä: 6   Yhteispaino: 108   (Suurin: 36 g)
+     Särki   Lukumäärä: 6   Yhteispaino: 112   (Suurin: 26 g)
+     Pasuri   Lukumäärä: 4   Yhteispaino: 455   (Suurin: 126 g)
+     Anakondah Sr:
+     Ahven   Lukumäärä: 26   Yhteispaino: 1578   (Suurin: 142 g)
+     Kiiski   Lukumäärä: 3   Yhteispaino: 33   (Suurin: 16 g)
+     Lahna   Lukumäärä: 1   Yhteispaino: 356   (Suurin: 356 g)
+     PikkuKupla:
+     Ahven   Lukumäärä: 7   Yhteispaino: 432   (Suurin: 91 g)
+     Kiiski   Lukumäärä: 1   Yhteispaino: 11   (Suurin: 11 g)
+     Lahna   Lukumäärä: 1   Yhteispaino: 287   (Suurin: 287 g)
+     Pasuri   Lukumäärä: 5   Yhteispaino: 624   (Suurin: 159 g)
+     Anakondah Jr (C):
+     Ahven   Lukumäärä: 16   Yhteispaino: 1112   (Suurin: 100 g)
+     Kiiski   Lukumäärä: 4   Yhteispaino: 54   (Suurin: 28 g)
+     Vileria (A):
+     Isoin kala:
+     lareman (C)  Taimen  1193 g
+
+--> Juku6.1 (A) [SK] [FIN] joined the game (ip: 164.5.194.18). [19.10.2018 14:58] [/banaddress 164.5.194.18 60 Juku6.1_(A)_[SK]_[FIN] 586784114 0286f03f4d617e08afda29f08b2ecd8bdcc95d62]
+--> Kirjuri joined the game (ip: 10.0.0.35). [19.10.2018 14:59] [/banaddress 10.0.0.35 60 Kirjuri 1284437777 ]
+--> simo pulkkinen joined the game (ip: 109.240.39.187). [19.10.2018 15:04] [/banaddress 109.240.39.187 60 simo_pulkkinen 2315486606 ]
+--> Pirkko [SK] [FIN] joined the game (ip: 46.254.209.217). [19.10.2018 15:05] [/banaddress 46.254.209.217 60 Pirkko_[SK]_[FIN] 2873362 ]
+--> metsuri [FI] joined the game (ip: 85.76.18.178). [19.10.2018 15:07] [/banaddress 85.76.18.178 60 metsuri_[FI] 280155762 edc1238f75ec88b7408f12440fffbaf21707dea5]
+<-- simo pulkkinen left the game. [19.10.2018 15:07]
+<-- ahti vähäkuopus left the game. [19.10.2018 15:09]
+--> Janitski joined the game (ip: 91.158.180.47). [19.10.2018 15:10] [/banaddress 91.158.180.47 60 Janitski 4227286378 ]
+--> `Giedrius(LTU) joined the game (ip: 5.20.249.35). [19.10.2018 15:15] [/banaddress 5.20.249.35 60 `Giedrius(LTU) 1287178654 ]
+--> Apo [FIN] joined the game (ip: 37.136.9.77). [19.10.2018 15:20] [/banaddress 37.136.9.77 60 Apo_[FIN] 1180602831 38f213c95b94096704c2afa8bdb37f7505624042]
+--> 777(kharkov) joined the game (ip: 93.178.216.122). [19.10.2018 15:23] [/banaddress 93.178.216.122 60 777(kharkov) 2687014112 ]
+--> Kekc43rus [RUS] joined the game (ip: 178.141.215.74). [19.10.2018 15:25] [/banaddress 178.141.215.74 60 Kekc43rus_[RUS] 3866870620 ]
+<-- Kekc43rus [RUS] left the game. [19.10.2018 15:25]

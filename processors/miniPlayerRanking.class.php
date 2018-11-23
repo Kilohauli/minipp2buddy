@@ -15,7 +15,6 @@ class miniPlayerRanking extends miniProcessor {
         foreach($this->_lakes as $index => $lake) {
             $processed = $lake->process();
             $this->_currentRound = $index;
-
             foreach($processed as $key => $player) {
                 if(!$player['name']) {
                     continue;
@@ -67,7 +66,7 @@ class miniPlayerRanking extends miniProcessor {
         }
         $out['biggest'] = $this->getBiggestFishes();
         $out['players'] = &$this->_players;
-        $this->addPlayerBiggestPoints($out['biggest']);
+       $this->addPlayerBiggestPoints($out['biggest']);
         
         if ($format === 'json') {
             $temp = json_encode($out);

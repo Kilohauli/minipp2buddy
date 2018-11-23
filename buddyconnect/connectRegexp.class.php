@@ -28,6 +28,28 @@ class connectRegexp extends miniRegexp {
      * Biggest fish was found
      */
     const BIGGEST_FISH_MATCH = 102;
+
+    /**
+     * Biggest fish with player name was found
+     */
+    const BIGGEST_FISH_PLAYER_MATCH = 103;
+    
+    // Constants for actions returned by self::sendDetails()
+    
+    /**
+     * Incomplete round, waiting for next send
+     */
+    const ACTION_INCOMPLETE = 201;
+    
+    /**
+     * Complete round, waiting for next round
+     */
+    const ACTION_COMPLETE = 202;
+    
+    /**
+     * Partial round, more data required from script
+     */
+    const ACTION_PARTIAL = 203;
     
     public function __construct(miniPPBuddy &$buddy) {
         parent::__construct($buddy);
@@ -61,30 +83,43 @@ class connectRegexp extends miniRegexp {
     public function process() {
         $reverse = $this->getReverseRows();
         $rows = $reverse->getRows();
+
         $rndStarts = null;
         $rndEnds = null;
+        $biggestFishMatch = false;
         foreach ($rows as $i => $row) {
+            $row = trim($row);
             $rowType = $this->rowType($row);
-            if ($rowType === self::BIGGEST_FISH_MATCH) {
+            if ($rowType === self::BIGGEST_FISH_PLAYER_MATCH) {
+                $biggestFishMatch = true;
                 $rndEnds = $i;
-                // Jump over next row that would contain "Isoin kala:"
-                continue 2;
-                //parent::process();
-                break;
+            } else if ($rowType === self::BIGGEST_FISH_MATCH && !$biggestFishMatch) {
+                $rndEnds = $i;
             } else if ($rowType === self::NEW_ROUND_MATCH) {
-                if ($rndEnds !== null) {
-                    $rndStarts = $i;
-                }
-                break;
+                $rndStarts = $i;
             }
         }
         if ($rndStarts !== null && $rndEnds !== null) {
-            $this->rows = array_reverse(array_slice($rows, $rndEnds, $rndStarts));
-        } else if ($rndStart === null && $rndEnds !== null) {
+            $this->rows = array_reverse($this->resetRows($rows, $rndStarts, $rndEnds));
+            parent::process();
+            $out = array(
+                'action' => self::ACTION_COMPLETE
+            );
+        } else if ($rndStarts === null && $rndEnds !== null) {
             // Longer partition from playlog required. Round start not found
-        } else if ($rndStart !== null && $rndEnds === null) {
-            // Incomplete round
+            $out = array(
+                'action' => self::ACTION_PARTIAL,
+                'start' => null,
+                'end' => $rndEnds
+            );
+        } else if ($rndStarts !== null && $rndEnds === null) {
+            $out = array(
+                'action' => self::ACTION_INCOMPLETE,
+                'start' => $rndStarts,
+                'end' => null
+            );
         }
+        return $out;
     }
     
     /**
@@ -100,6 +135,7 @@ class connectRegexp extends miniRegexp {
                 return self::NEW_ROUND_MATCH;
                 break;
             case $this->isBiggestFishPlayer($row) :
+                return self::BIGGEST_FISH_PLAYER_MATCH;
             case $this->isBiggestFish($row):
                 return self::BIGGEST_FISH_MATCH;
                 break;
@@ -122,9 +158,10 @@ class connectRegexp extends miniRegexp {
      * @param integer $start
      * @param integer $end
      */
-    protected function resetRows($start, $end) {
-        
+    protected function resetRows($rows, $start, $end) {
+        return array_slice($rows, $end, $start);
     }
+    
     /**
      * Slightly modified version of http://www.geekality.net/2011/05/28/php-tail-tackling-large-files/
      * @author Torleif Berger, Lorenzo Stanco
@@ -133,28 +170,28 @@ class connectRegexp extends miniRegexp {
      * @link https://gist.github.com/lorenzos/1711e81a9162320fde20 original 
      */
     public function tail($filepath, $lines = 1, $adaptive = true) {
-           $f = @fopen($filepath, "rb");
-           if ($f === false) return false;
-           if (!$adaptive) $buffer = 4096;
-           else $buffer = ($lines < 2 ? 64 : ($lines < 10 ? 512 : 4096));
-           fseek($f, -1, SEEK_END);
-           if (fread($f, 1) != "\n") $lines -= 1;
-           
-           $output = '';
-           $chunk = '';
+        $f = @fopen($filepath, "rb");
+        if ($f === false) { return false; }
+        if (!$adaptive) { $buffer = 4096; }
+        else { $buffer = ($lines < 2 ? 64 : ($lines < 10 ? 512 : 4096)); }
+        fseek($f, -1, SEEK_END);
+        if (fread($f, 1) != "\n") { $lines -= 1; }
 
-           while (ftell($f) > 0 && $lines >= 0) {
-                   $seek = min(ftell($f), $buffer);
-                   fseek($f, -$seek, SEEK_CUR);
-                   $output = ($chunk = fread($f, $seek)) . $output;
-                   fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
-                   $lines -= substr_count($chunk, "\n");
-           }
+        $output = '';
+        $chunk = '';
 
-           while ($lines++ < 0) {
-                   $output = substr($output, strpos($output, "\n") + 1);
-           }
-           fclose($f);
-           return trim($output);
+        while (ftell($f) > 0 && $lines >= 0) {
+            $seek = min(ftell($f), $buffer);
+            fseek($f, -$seek, SEEK_CUR);
+            $output = ($chunk = fread($f, $seek)) . $output;
+            fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
+            $lines -= substr_count($chunk, "\n");
+        }
+
+        while ($lines++ < 0) {
+            $output = substr($output, strpos($output, "\n") + 1);
+        }
+        fclose($f);
+        return trim($output);
     }
 }

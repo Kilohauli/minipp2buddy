@@ -85,18 +85,6 @@ class connectPlaylog implements Iterator {
     }
     
     /**
-     * Return values for curl to receive information what to do next
-     * @return array
-     */
-    public function getDetails() {
-        return array(
-            'current' => $this->key(),
-            'rnd' => $this->_roundStart,
-            'complete' => ($this->_isIncomplete ? 1 : 0)
-        );
-    }
-    
-    /**
      * Get rows array
      * @return array
      */
