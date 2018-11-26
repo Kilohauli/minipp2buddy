@@ -36,6 +36,7 @@ class miniPlayerRanking extends miniProcessor {
                 $this->addPlayerLakeResult($plrObj);
                 $this->addPlayerFishes($plrObj);
                 $this->addPlayerPoints($plrObj, $player['points']);
+                $this->addPlayerTags($plrObj);
                 $this->playedLake($plrObj);
             }
         }
@@ -155,6 +156,12 @@ class miniPlayerRanking extends miniProcessor {
         return array_key_exists($name, $this->_players);
     }
     
+    protected function addPlayerTags($plrObj) {
+        if ($plrObj->getTags()) {
+            $nameStripped = $this->_buddy->strip($plrObj->getName());
+            $this->_players[$nameStripped]['tags'] = $plrObj->getTags();
+        }
+    }
     /**
      * Initialises player structure to _teams['players'] array
      * @param miniPlayer $plrObj
@@ -175,7 +182,8 @@ class miniPlayerRanking extends miniProcessor {
             'lake_points' => array(),
             'lake_score' => array(),
             'biggest_points' => array(),
-            'fishes' => array()
+            'fishes' => array(),
+            'tags' => ''
         );
     }
     

@@ -88,7 +88,7 @@ class miniRegexp {
      * 0 = whole line
      * 1 = country code
      */
-    const PLAYER_COUNTRY = '/\s+\[(.*)\]\s+$/';
+    const PLAYER_COUNTRY = '/(\[.*\])$/';
     
     const PLAYER_TAGS = '/(\[.*\])/';
     /**
@@ -220,12 +220,12 @@ class miniRegexp {
         $fullNameWCountry = '';
         preg_match(self::PLAYER_INFORMATION, $row, $matches);
         $fullName = $matches[3];
-        preg_match(self::PLAYER_COUNTRY, $matches[3], $country);
+        preg_match(self::PLAYER_COUNTRY, trim($matches[3]), $country);
         if (isset($country[1])) {
-            $matches[] = $country[1];
+            $matches[] = str_replace(array("[", "]"), array('', ''), $country[1]);
             preg_match(self::PLAYER_TAGS, $matches[3], $tags);
-            $matches[3] = trim(str_replace("[" . $country[1] . "]", '', $matches[3]));
-            $fullNameWCountry = $matches[3] . " [" . $country[1] . "]"; 
+            $matches[3] = trim(str_replace($country[1], '', $matches[3]));
+            $fullNameWCountry = $matches[3] . $country[1]; 
             $this->buddy->setAltPlayerName($fullNameWCountry, $matches[3]);
         } else {
             $matches[] = null;
@@ -236,8 +236,10 @@ class miniRegexp {
             if (count($tagExp) == 2) {
                 $this->buddy->setAltPlayerName($matches[3] .$tagExp[0], $matches[3]);
                 $this->buddy->setAltPlayerName($matches[3] .$tagExp[1], $matches[3]);
+                $matches['tags'] = $tagExp[0] . " " . $tagExp[1];
             } else {
-                $this->buddy->setAltPlayerName($matches[3] .$tagExp[1], $matches[3]);
+                $this->buddy->setAltPlayerName($matches[3] .$tagExp[0], $matches[3]);
+                $matches['tags'] = $tagExp[0];
             }
         } else {
             $this->buddy->setAltPlayerName($taglessName, $matches[3]);
@@ -400,10 +402,10 @@ class miniRegexp {
         preg_match(self::PLAYER_INFORMATION_DISQ, $row, $matches);
         preg_match(self::PLAYER_COUNTRY, $matches[3], $country);
         if (isset($country[1])) {
-            //$matches[] = $country[1];
+            $matches[] = str_replace(array("[", "]"), array('', ''), $country[1]);
             $matches[3] = trim(str_replace("[" . $country[1] . "]", '', $matches[3]));
         } else {
-            //$matches[] = null;
+            $matches[] = null;
         }
 
         return $matches;
@@ -468,14 +470,14 @@ class miniRegexp {
         $rounds = $this->buddy->getRounds();
         $isDisqualified = false;
         foreach ($this->rows as $r) {
-            if (!mb_detect_encoding($r, "UTF-8", true)) {
-                $r = utf8_encode($r);
-            }
             $this->currentLine++;
             $r = trim($r);
             if (($this->isEmpty($r) && $this->getStage() !== self::BIGGEST) || $this->isSkip($r) ||
                     $this->getStage() == self::SKIP_UNTILL_NEW_ROUND && !$this->isNewRound($r)) {
                 continue;
+            }
+            if (!mb_detect_encoding($r, "UTF-8", true)) {
+                $r = utf8_encode($r);
             }
             
             switch (true) {
@@ -547,18 +549,22 @@ class miniRegexp {
                     if ($disconnected === true) {
                         $player->setDisconnected();
                     }
-                    
+                   
                     $player->setPosition($this->buddy->getRound(), $plr[1]);
                     $player->setTeam($plr[2]);
                     $player->setName($plr[3]);
                     $player->setScore($this->buddy->getRound(), $plr[4]);
 
+                    if (isset($plr['tags']) && $plr['tags'] !== '') {
+                        $player->setTags($plr['tags']);
+                    }
+                    
                     if (isset($plr[5])) {
                         $player->setCountry($plr[5]);
                     }
                     if ($player->isParser()) {
                         $this->_parsingPlayer = $player->getName();
-                    }                    
+                    }
                     break;
                 case ($this->isOwnFish($r)) :
                     $this->setStage(self::FISHES);

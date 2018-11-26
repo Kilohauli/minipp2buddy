@@ -12,6 +12,12 @@ class miniPlayer {
     protected $_wasDisconnected = false;
     protected $_isDisqualified = false;
     
+    /**
+     * For those players who have nickname [tag] [tag]
+     * @var string|boolean
+     */
+    protected $_tags = false;
+    
     private $_parsingPlayer = false;
     
     public function __construct(miniPPBuddy &$buddy) {
@@ -124,6 +130,17 @@ class miniPlayer {
         $this->_isDisqualified = true;
     }
     
+    public function setTags($tags) {
+        $this->_tags = $tags;
+    }
+    
+    public function getTags() {
+        if ($this->_tags !== false) {
+            return $this->_tags;
+        }
+        return false;
+    }
+    
     public function debug() {
         print_r(array(
             'name' => $this->name,
@@ -131,7 +148,8 @@ class miniPlayer {
             'country' => $this->country,
             'scores' => $this->scores,
             'positions' => $this->positions,
-            'fishies' => $this->fishes
+            'fishies' => $this->fishes,
+            'tags' => $this->_tags
         ));
     }
     
