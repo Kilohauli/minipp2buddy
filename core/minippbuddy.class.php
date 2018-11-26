@@ -29,6 +29,16 @@ class miniPPBuddy {
     private $players = array();
    
     /**
+     * Full player name string with all tags
+     * Stores alternative strings for names, nick [TAG] [TAG] breaks a bit
+     * of playlog also when it comes to fishes for player.
+     * Most likely due to player not using country and team name fields in game
+     * Array value points to stripped name in $players array key
+     * @var array
+     */
+    private $_playerAltNames = array();
+    
+    /**
      * @var int Amount of rounds to be parsed, zero equals to infinite rounds
      */
     private $rounds = 0;
@@ -135,6 +145,7 @@ class miniPPBuddy {
      * Remove odd characters for array keys
      * Characters include scandic ä, ö, å and so on
      * list can be adjusted when new issue arises, which will arise sooner than later
+     * @return string
      */
     public function strip($string) {
         return (string) strtolower(
@@ -260,6 +271,22 @@ class miniPPBuddy {
             return false;
         }
         return $this->players[$stripped];
+    }
+    
+    public function setAltPlayerName($altName, $name) {
+        $this->_playerAltNames[$this->strip($altName)] = $this->strip($name);
+    }
+    
+    public function getAltPlayerName($altName) {
+        $altName = $this->strip($altName);
+        if (array_key_exists($altName, $this->_playerAltNames)) {
+            return $this->_playerAltNames[$altName];
+        }
+        return false;
+    }
+    
+    public function getAltPlayerNames() {
+        return $this->_playerAltNames;
     }
     
     /**

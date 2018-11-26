@@ -10,6 +10,7 @@ class miniPlayer {
     protected $scores = array();
     protected $fishes = array();
     protected $_wasDisconnected = false;
+    protected $_isDisqualified = false;
     
     private $_parsingPlayer = false;
     
@@ -117,6 +118,10 @@ class miniPlayer {
     
     public function setDisconnected() {
         $this->_wasDisconnected = true;
+    }
+    
+    public function setDisqualified() {
+        $this->_isDisqualified = true;
     }
     
     public function debug() {

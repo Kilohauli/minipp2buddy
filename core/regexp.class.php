@@ -90,6 +90,7 @@ class miniRegexp {
      */
     const PLAYER_COUNTRY = '/\s+\[(.*)\]\s+$/';
     
+    const PLAYER_TAGS = '/(\[.*\])/';
     /**
      * Fishes player name
      * Used in two cases, stripping out the name and when testing if the row is the player name or fish result
@@ -213,20 +214,39 @@ class miniRegexp {
      */
     public function getPlayerDetails($row) {   
         // NetBeans complains for uninitialized variables
+        $tags = null;
         $matches = null;
         $country = null;
+        $fullNameWCountry = '';
         preg_match(self::PLAYER_INFORMATION, $row, $matches);
+        $fullName = $matches[3];
         preg_match(self::PLAYER_COUNTRY, $matches[3], $country);
         if (isset($country[1])) {
-            //$matches[] = $country[1];
+            $matches[] = $country[1];
+            preg_match(self::PLAYER_TAGS, $matches[3], $tags);
             $matches[3] = trim(str_replace("[" . $country[1] . "]", '', $matches[3]));
+            $fullNameWCountry = $matches[3] . " [" . $country[1] . "]"; 
+            $this->buddy->setAltPlayerName($fullNameWCountry, $matches[3]);
         } else {
-            //$matches[] = null;
+            $matches[] = null;
         }
-
+        $taglessName = $matches[3];
+        if (!empty($tags)) {
+            $tagExp = explode(" " , $tags[1]);
+            if (count($tagExp) == 2) {
+                $this->buddy->setAltPlayerName($matches[3] .$tagExp[0], $matches[3]);
+                $this->buddy->setAltPlayerName($matches[3] .$tagExp[1], $matches[3]);
+            } else {
+                $this->buddy->setAltPlayerName($matches[3] .$tagExp[1], $matches[3]);
+            }
+        } else {
+            $this->buddy->setAltPlayerName($taglessName, $matches[3]);
+        }
+        $this->buddy->setAltPlayerName($fullName, $matches[3]);
+        $this->buddy->setAltPlayerName($taglessName, $matches[3]);
         return $matches;
     }
-    
+
     /**
      * Check if pattern matches disconnected players.
      * This requires <- arrow before name and no (disq) after name
@@ -500,8 +520,8 @@ class miniRegexp {
                             $player = $this->buddy->newPlayer($plr[3]);
                         }
                         $isDisqualified = true;
-                        $this->setDisqualifiedPlayer($plr[3], $player);
-                        $disqualified = true;
+                        $this->setDisqualifiedPlayer($plr[3]);
+                        $player->setDisqualified();
                     } else if ($this->isDisconnected($r)) {
                         $plr = $this->getDisconnectedPlayerDetails($r);
                         if ($lake->playerExists($plr[3])) {
@@ -521,7 +541,7 @@ class miniRegexp {
                             $player = $this->buddy->newPlayer($plr[3]);
                         }
                         $disconnected = false;
-                        $disqualified = false;
+                        $isDisqualified = false;
                     }
                     $lake->setPlayer($player);
                     if ($disconnected === true) {
@@ -569,6 +589,9 @@ class miniRegexp {
                     $player = $this->buddy->getPlayer($plrName);
                     if (($player instanceof miniPlayer) === false) {
                         $player = $lake->getDisconnectedPlayer($plrName);
+                        if (($player instanceof miniPlayer) === false) {
+                            $player = $this->buddy->getPlayer($this->buddy->getAltPlayerName($plrName));
+                        }
                     }
                     $fishDetails = $this->fishForPlayer($r);
                     $player->setFishes($this->buddy->getRound(), $fishDetails);
