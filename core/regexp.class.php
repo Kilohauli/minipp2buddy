@@ -22,7 +22,7 @@ class miniRegexp {
     const NEW_ROUND_SELF = 'New LAN CLIENT';
     // Begin row processing after this row
     const FINISHED = 'Competition finished';
-    // Skip plenty of unnecessary rows through the file
+    // Identifies when to start processing fishes and attach first group into playlog owner
     const SKIP_OWN = 'Omat kalat:';
     // Joining players
     const JOIN = '-->';
@@ -105,7 +105,7 @@ class miniRegexp {
      * 3 = Total weight
      * 4 = Biggest
      */
-    const FISHES_FOR_PLAYER = '/([a-zA-ZäöåÄÖÅ\.]*)\s+[a-zA-ZäöåÄÖÅ\.]+:\s+(\d+)\s+[a-zA-Z]+:\s+(\d+)\s+\([a-zA-Z]+:\s(\d+)\s+g\)/';
+    const FISHES_FOR_PLAYER = '/([a-zA-ZäöåÄÖÅ\.]*)\s+[a-zA-ZäöåÄÖÅ\.\-0-9]+:\s+(\d+)\s+[a-zA-Z]+:\s+(\d+)\s+\([a-zA-Z]+:\s(\d+)\s+g\)/';
     
     /**
      * Biggest fish for the lake
