@@ -22,7 +22,7 @@ class miniRegexp {
     const NEW_ROUND_SELF = 'New LAN CLIENT';
     // Begin row processing after this row
     const FINISHED = 'Competition finished';
-    // Skip plenty of unnecessary rows through the file
+    // Identifies when to start processing fishes and attach first group into playlog owner
     const SKIP_OWN = 'Omat kalat:';
     // Joining players
     const JOIN = '-->';
@@ -75,12 +75,22 @@ class miniRegexp {
      */
     const PLAYER_INFORMATION = '/(\*\d+|\d+)\.\s+(\[.*\]\s){0,1}(.+)\s+(\d+)\s+g/';
     
+    /** Player information including with the country tag after name, was too lazy to build too complex regexp for now
+     * 0 = whole line
+     * 1 = result position
+     * 2 = Team tag (could be empty '')
+     * 3 = Name with the country tag (if there is one)
+     * 4 = score
+     */
+    const PLAYER_INFORMATION_DISQ = '/(\*\d+|\d+)\.\s+(\[.*\]\s){0,1}(.+)\s+(\d+)\s+g \(disq\)/';
+    
     /** Player country
      * 0 = whole line
      * 1 = country code
      */
-    const PLAYER_COUNTRY = '/\s+\[(.*)\]\s+$/';
+    const PLAYER_COUNTRY = '/(\[.*\])$/';
     
+    const PLAYER_TAGS = '/(\[.*\])/';
     /**
      * Fishes player name
      * Used in two cases, stripping out the name and when testing if the row is the player name or fish result
@@ -95,7 +105,7 @@ class miniRegexp {
      * 3 = Total weight
      * 4 = Biggest
      */
-    const FISHES_FOR_PLAYER = '/([a-zA-ZäöåÄÖÅ\.]*)\s+[a-zA-ZäöåÄÖÅ\.]+:\s+(\d+)\s+[a-zA-Z]+:\s+(\d+)\s+\([a-zA-Z]+:\s(\d+)\s+g\)/';
+    const FISHES_FOR_PLAYER = '/([a-zA-ZäöåÄÖÅ\.]*)\s+[a-zA-ZäöåÄÖÅ\.\-0-9]+:\s+(\d+)\s+[a-zA-Z]+:\s+(\d+)\s+\([a-zA-Z]+:\s(\d+)\s+g\)/';
     
     /**
      * Biggest fish for the lake
@@ -137,6 +147,13 @@ class miniRegexp {
      * @var array
      */
     protected $_disconnectedPlayers = array();
+    
+    /**
+     * Holds disqualified players, this is to fix if player whose playlog is
+     * processed does not finish but playlog still shows "Omat kalat:"
+     * @var array
+     */
+    protected $_disqualifiedPlayers = array();
     
     /**
      * Playlog might containt multiple new rounds without aborting string
@@ -197,20 +214,41 @@ class miniRegexp {
      */
     public function getPlayerDetails($row) {   
         // NetBeans complains for uninitialized variables
+        $tags = null;
         $matches = null;
         $country = null;
+        $fullNameWCountry = '';
         preg_match(self::PLAYER_INFORMATION, $row, $matches);
-        preg_match(self::PLAYER_COUNTRY, $matches[3], $country);
+        $fullName = $matches[3];
+        preg_match(self::PLAYER_COUNTRY, trim($matches[3]), $country);
         if (isset($country[1])) {
-            //$matches[] = $country[1];
-            $matches[3] = trim(str_replace("[" . $country[1] . "]", '', $matches[3]));
+            $matches[] = str_replace(array("[", "]"), array('', ''), $country[1]);
+            preg_match(self::PLAYER_TAGS, $matches[3], $tags);
+            $matches[3] = trim(str_replace($country[1], '', $matches[3]));
+            $fullNameWCountry = $matches[3] . $country[1]; 
+            $this->buddy->setAltPlayerName($fullNameWCountry, $matches[3]);
         } else {
-            //$matches[] = null;
+            $matches[] = null;
         }
-
+        $taglessName = $matches[3];
+        if (!empty($tags)) {
+            $tagExp = explode(" " , $tags[1]);
+            if (count($tagExp) == 2) {
+                $this->buddy->setAltPlayerName($matches[3] .$tagExp[0], $matches[3]);
+                $this->buddy->setAltPlayerName($matches[3] .$tagExp[1], $matches[3]);
+                $matches['tags'] = $tagExp[0] . " " . $tagExp[1];
+            } else {
+                $this->buddy->setAltPlayerName($matches[3] .$tagExp[0], $matches[3]);
+                $matches['tags'] = $tagExp[0];
+            }
+        } else {
+            $this->buddy->setAltPlayerName($taglessName, $matches[3]);
+        }
+        $this->buddy->setAltPlayerName($fullName, $matches[3]);
+        $this->buddy->setAltPlayerName($taglessName, $matches[3]);
         return $matches;
     }
-    
+
     /**
      * Check if pattern matches disconnected players.
      * This requires <- arrow before name and no (disq) after name
@@ -318,7 +356,7 @@ class miniRegexp {
         }
         return false;
     }
-    
+
     /**
      * Set disqualified player, no need for key as using array_search
      * @param string $name
@@ -343,12 +381,6 @@ class miniRegexp {
         }
     }
     
-    public function isDisqualified($row) {
-        if (preg_match(self::DISQUALIFIED, $row)) {
-            return true;
-        }
-        return false;
-    }
     /**
      * Reset _disconnectedPlayers array for new round
      */
@@ -356,13 +388,37 @@ class miniRegexp {
         $this->_disconnectedPlayers = array();
     }
     
-/*    public function isDisqualified($row) { MOST LIKELY TO BE REMOVED
+    public function isDisqualified($row) {
         if (preg_match(self::DISQUALIFIED, $row)) {
             return true;
         }
         return false;
     }
-*/    
+        
+    public function getDisqualifiedPlayerDetails($row) {
+        // NetBeans complains for uninitialized variables
+        $matches = null;
+        $country = null;
+        preg_match(self::PLAYER_INFORMATION_DISQ, $row, $matches);
+        preg_match(self::PLAYER_COUNTRY, $matches[3], $country);
+        if (isset($country[1])) {
+            $matches[] = str_replace(array("[", "]"), array('', ''), $country[1]);
+            $matches[3] = trim(str_replace("[" . $country[1] . "]", '', $matches[3]));
+        } else {
+            $matches[] = null;
+        }
+
+        return $matches;
+    }
+
+    public function setDisqualifiedPlayer($name) {
+        $this->_disqualifiedPlayers[] = $name;
+    }
+    
+    public function clearDisqualifiedPlayers() {
+        $this->_disqualifiedPlayers = array();
+    }
+
     public function isOwnFish($row) {
         if (strpos($row, self::SKIP_OWN) === 0) {
             return true;
@@ -412,16 +468,16 @@ class miniRegexp {
         $lake = null;
         $player = null;
         $rounds = $this->buddy->getRounds();
-        
+        $isDisqualified = false;
         foreach ($this->rows as $r) {
-            if (!mb_detect_encoding($r, "UTF-8", true)) {
-                $r = utf8_encode($r);
-            }
             $this->currentLine++;
             $r = trim($r);
             if (($this->isEmpty($r) && $this->getStage() !== self::BIGGEST) || $this->isSkip($r) ||
                     $this->getStage() == self::SKIP_UNTILL_NEW_ROUND && !$this->isNewRound($r)) {
                 continue;
+            }
+            if (!mb_detect_encoding($r, "UTF-8", true)) {
+                $r = utf8_encode($r);
             }
             
             switch (true) {
@@ -447,14 +503,28 @@ class miniRegexp {
                     $lake->setBiggestPoints($this->buddy->getBiggestPoints($this->buddy->getRound()));
                     $this->setStage(self::IRRELEVANT);
                     $this->_parsingResults = true;
+                    
+                    $this->clearDisconnectedPlayers();
+                    $this->clearDisqualifiedPlayers();
                     break;
                 case $this->isFinished($r):
                     $this->setStage(self::RESULTS);
                     break;
-                case ($this->getStage() === self::RESULTS && $this->isDisqualified($r)):
-                    continue;
+/*                case ($this->getStage() === self::RESULTS && $this->isDisqualified($r)):
+                    continue;*/
                 case ($this->getStage() === self::RESULTS && $this->isResult($r)):
-                    if ($this->isDisconnected($r)) {
+                    if ($this->isDisqualified($r)) {
+                        $plr = $this->getDisqualifiedPlayerDetails($r);
+                        if ($lake->playerExists($plr[3])) {
+                            continue;
+                        }
+                        if (!$player = $this->buddy->getPlayer($plr[3])) {
+                            $player = $this->buddy->newPlayer($plr[3]);
+                        }
+                        $isDisqualified = true;
+                        $this->setDisqualifiedPlayer($plr[3]);
+                        $player->setDisqualified();
+                    } else if ($this->isDisconnected($r)) {
                         $plr = $this->getDisconnectedPlayerDetails($r);
                         if ($lake->playerExists($plr[3])) {
                             continue;
@@ -473,22 +543,28 @@ class miniRegexp {
                             $player = $this->buddy->newPlayer($plr[3]);
                         }
                         $disconnected = false;
+                        $isDisqualified = false;
                     }
                     $lake->setPlayer($player);
                     if ($disconnected === true) {
                         $player->setDisconnected();
                     }
-                    
+                   
                     $player->setPosition($this->buddy->getRound(), $plr[1]);
                     $player->setTeam($plr[2]);
                     $player->setName($plr[3]);
                     $player->setScore($this->buddy->getRound(), $plr[4]);
+
+                    if (isset($plr['tags']) && $plr['tags'] !== '') {
+                        $player->setTags($plr['tags']);
+                    }
+                    
                     if (isset($plr[5])) {
                         $player->setCountry($plr[5]);
                     }
                     if ($player->isParser()) {
                         $this->_parsingPlayer = $player->getName();
-                    }                    
+                    }
                     break;
                 case ($this->isOwnFish($r)) :
                     $this->setStage(self::FISHES);
@@ -519,6 +595,9 @@ class miniRegexp {
                     $player = $this->buddy->getPlayer($plrName);
                     if (($player instanceof miniPlayer) === false) {
                         $player = $lake->getDisconnectedPlayer($plrName);
+                        if (($player instanceof miniPlayer) === false) {
+                            $player = $this->buddy->getPlayer($this->buddy->getAltPlayerName($plrName));
+                        }
                     }
                     $fishDetails = $this->fishForPlayer($r);
                     $player->setFishes($this->buddy->getRound(), $fishDetails);

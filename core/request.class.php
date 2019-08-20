@@ -34,9 +34,8 @@ class miniRequest {
     public function sanitizePageQuery() {
         if (isset($_GET['q'])) {
             preg_match('/([a-zA-Z])/', $_GET['q'], $q);
-            print_r($q);
             if ($q) {
-                $_GET['q'] = filter_input('', 'q', '');
+                $_GET['q'] = filter_input(INPUT_GET, 'q');
             }
             
         }
